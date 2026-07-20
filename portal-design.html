@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HONO SEA Sales Hub — Portal Design</title>
+<style>
+  :root{
+    --ink:#0f1222; --ink-2:#3a3f5c; --muted:#6b7192;
+    --brand:#4f46e5; --brand-2:#7c3aed; --teal:#0ea5a4; --amber:#f59e0b;
+    --line:#e7e8f0; --bg:#f5f6fb; --card:#ffffff; --soft:#f0f1f9;
+    --ok:#16a34a; --shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);
+    --shadow-lg:0 24px 60px rgba(16,18,40,.18);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:40;
+    background:rgba(255,255,255,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{display:flex;align-items:center;gap:18px;height:64px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.2px}
+  .logo .mark{
+    width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-size:15px;
+    box-shadow:0 6px 16px rgba(79,70,229,.35);
+  }
+  .logo .name{font-size:16px}
+  .logo .name span{color:var(--muted);font-weight:600}
+  .search{flex:1;max-width:520px;position:relative}
+  .search input{
+    width:100%;height:42px;border:1px solid var(--line);border-radius:11px;
+    padding:0 14px 0 40px;font-size:14px;background:var(--card);outline:none;color:var(--ink);
+    transition:border .15s, box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+  .search svg{position:absolute;left:13px;top:12px;color:var(--muted)}
+  .top-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+  .region{
+    display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--line);
+    border-radius:10px;background:var(--card);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer
+  }
+  .region .dot{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,#0ea5a4,#4f46e5);font-size:14px
+  }
+  .icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;color:var(--ink-2);cursor:pointer}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:
+      radial-gradient(1000px 340px at 88% -40%,rgba(124,58,237,.25),transparent),
+      radial-gradient(760px 320px at 4% -10%,rgba(14,165,164,.22),transparent),
+      linear-gradient(120deg,#171a35,#221a4a 60%,#2a1d54);
+    color:#fff;position:relative;overflow:hidden
+  }
+  .hero-inner{padding:34px 0 96px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c9c6ff;opacity:.95}
+  .eyebrow .pip{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px rgba(14,165,164,.25)}
+  .hero h1{font-size:30px;line-height:1.15;margin:14px 0 8px;font-weight:800;letter-spacing:-.3px;max-width:660px}
+  .hero p{margin:0;color:#c8caea;max-width:560px;font-size:15px}
+  .hero-cta{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+  .btn{
+    height:44px;padding:0 18px;border-radius:11px;font-weight:700;font-size:14px;border:0;cursor:pointer;
+    display:inline-flex;align-items:center;gap:9px
+  }
+  .btn.primary{background:#fff;color:var(--ink)}
+  .btn.ghost{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.22)}
+  .btn.primary:hover{transform:translateY(-1px)}
+  .btn.ghost:hover{background:rgba(255,255,255,.18)}
+
+  /* KPI strip overlapping hero */
+  .kpis{margin-top:-64px;position:relative;z-index:5}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpi{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)
+  }
+  .kpi .lab{font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:7px}
+  .kpi .val{font-size:26px;font-weight:800;margin-top:6px;letter-spacing:-.5px}
+  .kpi .sub{font-size:12px;font-weight:700;margin-top:2px}
+  .up{color:var(--ok)} .down{color:#dc2626} .flat{color:var(--muted)}
+  .kpi .ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--soft);color:var(--brand)}
+
+  /* ---------- sections ---------- */
+  section{padding:34px 0}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:14px}
+  .sec-head h2{font-size:19px;margin:0;font-weight:800;letter-spacing:-.2px}
+  .sec-head .desc{font-size:13px;color:var(--muted);margin-top:3px}
+  .link{color:var(--brand);font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+
+  /* pillars */
+  .pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .pillar{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;cursor:pointer;
+    box-shadow:var(--shadow);transition:transform .16s, box-shadow .16s, border-color .16s;position:relative;overflow:hidden
+  }
+  .pillar:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:#d9dbef}
+  .pillar .pico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:20px}
+  .pillar h3{margin:14px 0 5px;font-size:16px;font-weight:800}
+  .pillar p{margin:0;font-size:13px;color:var(--muted);min-height:38px}
+  .pillar .meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+  .pillar .count{font-size:12px;font-weight:700;color:var(--ink-2)}
+  .pillar .go{font-size:12px;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:5px}
+  .tag-p{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+  .tag-d{background:linear-gradient(135deg,#0ea5a4,#0891b2)}
+  .tag-b{background:linear-gradient(135deg,#f59e0b,#ef7d10)}
+  .tag-r{background:linear-gradient(135deg,#e11d63,#a21caf)}
+
+  /* two-column layout */
+  .cols{display:grid;grid-template-columns:1.55fr 1fr;gap:22px;align-items:start}
+
+  /* country grid */
+  .country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .country{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;gap:12px;align-items:center;cursor:pointer;
+    transition:transform .14s,box-shadow .14s
+  }
+  .country:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .flag{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:20px;background:var(--soft);flex:none}
+  .country .cn{font-weight:800;font-size:14px}
+  .country .cs{font-size:12px;color:var(--muted)}
+  .lead-pill{margin-top:5px;display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--ink-2)}
+
+  /* recent list */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .card .card-h{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .card .card-h h3{margin:0;font-size:15px;font-weight:800}
+  .doc{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer}
+  .doc:last-child{border-bottom:0}
+  .doc:hover{background:var(--soft)}
+  .ft{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex:none}
+  .ppt{background:#c43e1c}.pdf{background:#e11d2f}.doc-f{background:#2b579a}.xls{background:#207245}.vid{background:#7c3aed}
+  .doc .dn{font-weight:700;font-size:13.5px;line-height:1.25}
+  .doc .dm{font-size:12px;color:var(--muted);margin-top:2px}
+  .doc .badge{margin-left:auto;font-size:11px;font-weight:700;color:var(--ink-2);background:var(--soft);padding:3px 9px;border-radius:999px;white-space:nowrap}
+
+  /* right rail widgets */
+  .widget{margin-bottom:22px}
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+  .ql{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;transition:border .14s,background .14s}
+  .ql:hover{border-color:var(--brand);background:var(--soft)}
+  .qi{width:26px;height:26px;border-radius:8px;background:var(--soft);display:grid;place-items:center;color:var(--brand);flex:none}
+  .ann{padding:14px 18px;border-bottom:1px solid var(--line)}
+  .ann:last-child{border-bottom:0}
+  .ann .at{font-weight:800;font-size:13.5px;display:flex;gap:8px;align-items:center}
+  .ann .ad{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .ann . when{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  .dotm{width:8px;height:8px;border-radius:50%;flex:none}
+
+  /* leaderboard */
+  .lb-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+  .lb-row:last-child{border-bottom:0}
+  .rank{width:24px;height:24px;border-radius:7px;background:var(--soft);display:grid;place-items:center;font-weight:800;font-size:12px;flex:none}
+  .rank.g{background:#fef3c7;color:#b45309}
+  .bar{flex:1;height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--brand))}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(16,18,40,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
+  .overlay.open{display:flex}
+  .modal{background:var(--bg);width:min(760px,100%);max-height:88vh;overflow:auto;border-radius:20px;box-shadow:var(--shadow-lg)}
+  .modal-h{padding:22px 24px;color:#fff;position:relative}
+  .modal-h h3{margin:0;font-size:20px;font-weight:800}
+  .modal-h p{margin:6px 0 0;font-size:13px;opacity:.9}
+  .modal-x{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.18);border:0;color:#fff;cursor:pointer;font-size:18px}
+  .modal-b{padding:20px 24px}
+  .lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .lib{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px}
+  .lib h4{margin:0 0 4px;font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .lib ul{margin:8px 0 0;padding-left:18px;color:var(--ink-2);font-size:12.5px}
+  .lib li{margin:3px 0}
+  .chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--ink-2);margin:2px 4px 2px 0}
+  .meta-note{font-size:12.5px;color:var(--muted);margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+
+  /* ---------- blueprint ---------- */
+  .blueprint{background:#111427;color:#e9eaf6;border-radius:22px;overflow:hidden}
+  .bp-head{padding:26px 28px 6px}
+  .bp-head h2{margin:0;font-size:20px;font-weight:800;color:#fff}
+  .bp-head p{margin:8px 0 0;color:#9fa3c9;font-size:13.5px;max-width:720px}
+  .bp-body{padding:20px 28px 28px}
+  .bp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  .bp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
+  .bp .bpk{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8be0df}
+  .bp h4{margin:9px 0 6px;font-size:14.5px;color:#fff}
+  .bp p{margin:0;color:#b8bce0;font-size:12.5px}
+  .bp .layer{font-size:12.5px;color:#cdd0ee;margin:5px 0;display:flex;gap:8px;align-items:flex-start}
+  .bp .layer b{color:#fff}
+  .arrowflow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;font-size:12.5px;color:#b8bce0}
+  .flowbox{background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.4);color:#e7defd;padding:7px 12px;border-radius:9px;font-weight:700}
+  .arrowflow .ar{color:#6b7192;font-weight:800}
+
+  footer{padding:34px 0;color:var(--muted);font-size:12.5px;text-align:center}
+  .disc{max-width:760px;margin:0 auto;padding:14px 18px;background:#fff;border:1px solid var(--line);border-radius:12px}
+
+  @media(max-width:940px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .pillars{grid-template-columns:repeat(2,1fr)}
+    .cols{grid-template-columns:1fr}
+    .country-grid{grid-template-columns:repeat(2,1fr)}
+    .bp-grid{grid-template-columns:1fr}
+    .search{display:none}
+  }
+  @media(max-width:560px){
+    .kpi-grid,.pillars,.country-grid,.lib-grid,.quick{grid-template-columns:1fr}
+    .hero h1{font-size:24px}
+    .region .txt{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="logo">
+      <div class="mark">H</div>
+      <div class="name">HONO <span>| SEA Sales Hub</span></div>
+    </div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Search proposals, decks, playbooks, clients…" oninput="filterDocs()"/>
+    </div>
+    <div class="top-actions">
+      <div class="region"><span class="dot"></span><span class="txt">All SEA Markets</span> ▾</div>
+      <button class="icon-btn" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </button>
+      <div class="avatar" title="Boonchoo Malhotra — SEA Business Head">BM</div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap hero-inner">
+    <span class="eyebrow"><span class="pip"></span> One source of truth · Sales enablement</span>
+    <h1>Everything your SEA sales teams need to win — in one place.</h1>
+    <p>Proposals, decks, pricing, playbooks and client records for the Philippines, Indonesia, Malaysia and every HONO market — always current, always on-brand.</p>
+    <div class="hero-cta">
+      <button class="btn primary" onclick="openPillar('p')">📂 Browse the library</button>
+      <button class="btn ghost" onclick="scrollToId('countries')">🌏 Go to my market</button>
+    </div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="wrap kpis">
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="lab"><span class="ico">📊</span> Active pipeline</div>
+      <div class="val">$4.8M</div>
+      <div class="sub up">▲ 12% vs last quarter</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="ico">🎯</span> Quota attainment</div>
+      <div class="val">78%</div>
+      <div class="sub up">▲ 6 pts · on track</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="ico">🏆</span> Win rate (QTD)</div>
+      <div class="val">31%</div>
+      <div class="sub flat">– steady</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="ico">📁</span> Assets in hub</div>
+      <div class="val">642</div>
+      <div class="sub up">▲ 28 added this week</div>
+    </div>
+  </div>
+</div>
+
+<!-- PILLARS -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Sales content library</h2>
+        <div class="desc">Four governed pillars — click any card to see what's inside.</div>
+      </div>
+      <span class="link" onclick="scrollToId('blueprint')">How it's structured →</span>
+    </div>
+    <div class="pillars">
+      <div class="pillar" onclick="openPillar('p')">
+        <div class="pico tag-p">📄</div>
+        <h3>Proposals &amp; Pricing</h3>
+        <p>Approved templates, price books, discount rules and ROI calculators.</p>
+        <div class="meta"><span class="count">168 files</span><span class="go">Open →</span></div>
+      </div>
+      <div class="pillar" onclick="openPillar('d')">
+        <div class="pico tag-d">🎞️</div>
+        <h3>Decks &amp; Collateral</h3>
+        <p>Pitch decks, one-pagers, case studies, brochures and demo videos.</p>
+        <div class="meta"><span class="count">214 files</span><span class="go">Open →</span></div>
+      </div>
+      <div class="pillar" onclick="openPillar('b')">
+        <div class="pico tag-b">📘</div>
+        <h3>Playbooks &amp; Process</h3>
+        <p>GTM playbooks, discovery scripts, objection handling and battlecards.</p>
+        <div class="meta"><span class="count">96 files</span><span class="go">Open →</span></div>
+      </div>
+      <div class="pillar" onclick="openPillar('r')">
+        <div class="pico tag-r">🗂️</div>
+        <h3>Deal &amp; Client Records</h3>
+        <p>Account files, meeting notes, competitive intel and win/loss reviews.</p>
+        <div class="meta"><span class="count">164 files</span><span class="go">Open →</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TWO COLUMN: recent + rail -->
+<section style="padding-top:6px">
+  <div class="wrap cols">
+    <div>
+      <div class="card widget">
+        <div class="card-h">
+          <h3>Recently added &amp; featured</h3>
+          <span class="link" onclick="clearSearch()">Reset</span>
+        </div>
+        <div id="docList"></div>
+      </div>
+
+      <!-- COUNTRIES -->
+      <div id="countries" class="sec-head" style="margin-top:26px">
+        <div>
+          <h2>Country &amp; market workspaces</h2>
+          <div class="desc">Local pricing, language collateral and deals — inheriting from the global hub.</div>
+        </div>
+      </div>
+      <div class="country-grid">
+        <div class="country" onclick="openMarket('Philippines')"><div class="flag">🇵🇭</div><div><div class="cn">Philippines</div><div class="cs">Country Head · 42 deals</div><span class="lead-pill">Local team</span></div></div>
+        <div class="country" onclick="openMarket('Indonesia')"><div class="flag">🇮🇩</div><div><div class="cn">Indonesia</div><div class="cs">Country Head · 51 deals</div><span class="lead-pill">Local team</span></div></div>
+        <div class="country" onclick="openMarket('Malaysia')"><div class="flag">🇲🇾</div><div><div class="cn">Malaysia</div><div class="cs">Country Head · 37 deals</div><span class="lead-pill">Local team</span></div></div>
+        <div class="country" onclick="openMarket('Singapore')"><div class="flag">🇸🇬</div><div><div class="cn">Singapore</div><div class="cs">Led by SEA HQ · 19 deals</div><span class="lead-pill">Regional</span></div></div>
+        <div class="country" onclick="openMarket('Thailand')"><div class="flag">🇹🇭</div><div><div class="cn">Thailand</div><div class="cs">Led by SEA HQ · 14 deals</div><span class="lead-pill">Regional</span></div></div>
+        <div class="country" onclick="openMarket('Vietnam')"><div class="flag">🇻🇳</div><div><div class="cn">Vietnam</div><div class="cs">Led by SEA HQ · 11 deals</div><span class="lead-pill">Regional</span></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <aside>
+      <div class="card widget">
+        <div class="card-h"><h3>Quick actions</h3></div>
+        <div class="quick">
+          <div class="ql" onclick="openPillar('p')"><span class="qi">＋</span> New proposal</div>
+          <div class="ql" onclick="openPillar('p')"><span class="qi">＄</span> Price book</div>
+          <div class="ql" onclick="openPillar('d')"><span class="qi">▤</span> Latest deck</div>
+          <div class="ql" onclick="openPillar('b')"><span class="qi">⚔</span> Battlecard</div>
+          <div class="ql" onclick="openPillar('r')"><span class="qi">◱</span> Log a deal</div>
+          <div class="ql" onclick="scrollToId('blueprint')"><span class="qi">?</span> Request access</div>
+        </div>
+      </div>
+
+      <div class="card widget">
+        <div class="card-h"><h3>Announcements</h3></div>
+        <div class="ann"><div class="at"><span class="dotm" style="background:var(--amber)"></span> Q3 price book is live</div><div class="ad">Updated SEA list pricing + new mid-market bundle. Old versions archived.</div><div class="when">2 days ago</div></div>
+        <div class="ann"><div class="at"><span class="dotm" style="background:var(--brand)"></span> New payroll case study — Indonesia</div><div class="ad">2,400-employee logistics client. Approved for external use.</div><div class="when">5 days ago</div></div>
+        <div class="ann"><div class="at"><span class="dotm" style="background:var(--teal)"></span> Competitor battlecard refreshed</div><div class="ad">Updated positioning vs. regional HRMS players.</div><div class="when">1 week ago</div></div>
+      </div>
+
+      <div class="card widget">
+        <div class="card-h"><h3>Market pipeline</h3></div>
+        <div class="lb-row"><span class="rank g">1</span><div style="min-width:82px;font-weight:700;font-size:13px">Indonesia</div><div class="bar"><i style="width:92%"></i></div></div>
+        <div class="lb-row"><span class="rank">2</span><div style="min-width:82px;font-weight:700;font-size:13px">Philippines</div><div class="bar"><i style="width:74%"></i></div></div>
+        <div class="lb-row"><span class="rank">3</span><div style="min-width:82px;font-weight:700;font-size:13px">Malaysia</div><div class="bar"><i style="width:63%"></i></div></div>
+        <div class="lb-row"><span class="rank">4</span><div style="min-width:82px;font-weight:700;font-size:13px">Singapore</div><div class="bar"><i style="width:38%"></i></div></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- BLUEPRINT -->
+<section id="blueprint">
+  <div class="wrap">
+    <div class="blueprint">
+      <div class="bp-head">
+        <h2>Behind the design · How it works on Microsoft 365</h2>
+        <p>The portal is a SharePoint <b>hub site</b> that connects one global content site with a workspace for each market. Content is stored once, tagged with metadata, and surfaced everywhere through search and filters — so country heads reuse HQ assets instead of rebuilding them.</p>
+      </div>
+      <div class="bp-body">
+        <div class="bp-grid">
+          <div class="bp">
+            <div class="bpk">Architecture</div>
+            <h4>Hub + spoke sites</h4>
+            <div class="layer"><b>·</b><span><b>Hub:</b> SEA Sales Hub (this portal home &amp; global search)</span></div>
+            <div class="layer"><b>·</b><span><b>Global site:</b> master proposals, pricing, decks, playbooks</span></div>
+            <div class="layer"><b>·</b><span><b>Market sites:</b> PH · ID · MY · SG · TH · VN localised content</span></div>
+          </div>
+          <div class="bp">
+            <div class="bpk">Storage</div>
+            <h4>Governed libraries</h4>
+            <div class="layer"><b>·</b><span>One document library per pillar with version history</span></div>
+            <div class="layer"><b>·</b><span>Metadata columns: Market, Industry, Deal stage, Status, Owner, Expiry</span></div>
+            <div class="layer"><b>·</b><span>Content types enforce approved templates</span></div>
+          </div>
+          <div class="bp">
+            <div class="bpk">Access &amp; control</div>
+            <h4>Permissions &amp; trust</h4>
+            <div class="layer"><b>·</b><span>M365 groups: Everyone (read) · Country teams (edit) · Sales Ops (approve)</span></div>
+            <div class="layer"><b>·</b><span>Approval flow + "latest approved" labels via Power Automate</span></div>
+            <div class="layer"><b>·</b><span>Auto-archive on the Expiry date to kill stale collateral</span></div>
+          </div>
+        </div>
+        <div class="arrowflow">
+          <span class="flowbox">Author in Global site</span><span class="ar">→</span>
+          <span class="flowbox">Sales Ops approves</span><span class="ar">→</span>
+          <span class="flowbox">Tagged &amp; published to Hub</span><span class="ar">→</span>
+          <span class="flowbox">Country teams reuse &amp; localise</span><span class="ar">→</span>
+          <span class="flowbox">Usage &amp; win/loss feeds back</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="disc"><b>Design prototype</b> — HONO SEA Sales Hub concept. Figures, files and deals shown are illustrative placeholders to demonstrate layout and structure. Built on Microsoft 365 / SharePoint Online.</div>
+    <div style="margin-top:14px">HONO SEA Sales Hub · Prepared for Boonchoo Malhotra, SEA Business Head</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-h" id="modalHead">
+      <button class="modal-x" onclick="closeModal()">×</button>
+      <h3 id="modalTitle">Pillar</h3>
+      <p id="modalSub">Description</p>
+    </div>
+    <div class="modal-b" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- sample data ---------------- */
+const DOCS = [
+  {n:"HONO Payroll Proposal — Master Template", t:"ppt", pillar:"Proposals & Pricing", m:"Updated 2d ago · Sales Ops", tag:"Template"},
+  {n:"SEA Price Book Q3 FY26", t:"xls", pillar:"Proposals & Pricing", m:"Updated 2d ago · Approved", tag:"Latest"},
+  {n:"HONO Corporate Pitch Deck 2026", t:"ppt", pillar:"Decks & Collateral", m:"Updated 1w ago · Marketing", tag:"On-brand"},
+  {n:"Case Study — Indonesia Logistics (2,400 emp)", t:"pdf", pillar:"Decks & Collateral", m:"Updated 5d ago · External-OK", tag:"New"},
+  {n:"Discovery Call Script — HRMS", t:"doc", pillar:"Playbooks & Process", m:"Updated 3w ago · Enablement", tag:"Playbook"},
+  {n:"Battlecard — vs Regional HRMS Players", t:"pdf", pillar:"Playbooks & Process", m:"Updated 1w ago · Sales Ops", tag:"Updated"},
+  {n:"ROI Calculator — Payroll Automation", t:"xls", pillar:"Proposals & Pricing", m:"Updated 2w ago · Presales", tag:"Tool"},
+  {n:"Product Demo — Attendance & Leave", t:"vid", pillar:"Decks & Collateral", m:"Updated 2w ago · 6:12", tag:"Video"},
+  {n:"Win/Loss Review — Q2 FY26 (SEA)", t:"doc", pillar:"Deal & Client Records", m:"Updated 3w ago · SEA HQ", tag:"Internal"},
+  {n:"Account Plan — Malaysia Manufacturing Co.", t:"doc", pillar:"Deal & Client Records", m:"Updated 4d ago · MY Team", tag:"Deal"},
+  {n:"One-Pager — Core HR Module", t:"pdf", pillar:"Decks & Collateral", m:"Updated 1w ago · Marketing", tag:"Leave-behind"},
+  {n:"Discount Approval Matrix", t:"xls", pillar:"Proposals & Pricing", m:"Updated 1mo ago · Finance", tag:"Policy"},
+];
+
+function ftClass(t){return t==="ppt"?"ppt":t==="pdf"?"pdf":t==="doc"?"doc-f":t==="xls"?"xls":"vid";}
+function ftLabel(t){return t==="ppt"?"PPTX":t==="pdf"?"PDF":t==="doc"?"DOCX":t==="xls"?"XLSX":"MP4";}
+
+function renderDocs(list){
+  const el=document.getElementById("docList");
+  if(!list.length){el.innerHTML='<div style="padding:26px 18px;color:#6b7192;font-size:13px">No matches. Try another keyword.</div>';return;}
+  el.innerHTML=list.map(d=>`
+    <div class="doc" onclick="toast('${d.n.replace(/'/g,"")}')">
+      <div class="ft ${ftClass(d.t)}">${ftLabel(d.t)}</div>
+      <div><div class="dn">${d.n}</div><div class="dm">${d.pillar} · ${d.m}</div></div>
+      <span class="badge">${d.tag}</span>
+    </div>`).join("");
+}
+function filterDocs(){
+  const q=document.getElementById("q").value.toLowerCase().trim();
+  renderDocs(DOCS.filter(d=>(d.n+" "+d.pillar+" "+d.tag).toLowerCase().includes(q)));
+}
+function clearSearch(){document.getElementById("q").value="";renderDocs(DOCS);}
+function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});}
+
+/* ---------------- modal ---------------- */
+const PILLARS={
+  p:{title:"Proposals & Pricing",sub:"Approved templates, price books and deal tools — the numbers your teams quote from.",grad:"linear-gradient(135deg,#4f46e5,#7c3aed)",
+     libs:[
+       {h:"📄 Proposal templates",items:["Master proposal (by module)","Short-form / SME proposal","RFP response library","Executive summary blocks"]},
+       {h:"＄ Pricing & policy",items:["SEA price book (current + archive)","Discount approval matrix","Currency & tax notes by market","Bundle / package sheets"]},
+       {h:"📈 Deal tools",items:["ROI / TCO calculator","Business case builder","Competitive pricing guide"]},
+       {h:"🏷️ Governance",items:["Content type: 'Approved Proposal'","Owner: Sales Ops","Expiry & re-approval reminders"]}
+     ],chips:["Market","Module","Currency","Approval status","Valid until"]},
+  d:{title:"Decks & Collateral",sub:"Everything client-facing — pitch, prove and leave behind.",grad:"linear-gradient(135deg,#0ea5a4,#0891b2)",
+     libs:[
+       {h:"🎤 Pitch decks",items:["Corporate master deck","Module-specific decks","Industry-tailored versions"]},
+       {h:"📑 One-pagers & brochures",items:["Module one-pagers","Solution brochures","Leave-behind flyers"]},
+       {h:"🏅 Proof",items:["Case studies (by market/industry)","Testimonials & logos","Analyst / award mentions"]},
+       {h:"🎬 Demo media",items:["Recorded product demos","Explainer videos","Screenshot & image bank"]}
+     ],chips:["Market","Industry","External-OK","Language","Version"]},
+  b:{title:"Playbooks & Process",sub:"How we sell — the repeatable motion behind every win.",grad:"linear-gradient(135deg,#f59e0b,#ef7d10)",
+     libs:[
+       {h:"📘 GTM playbooks",items:["SEA sales methodology","Segment / persona playbooks","New-market entry guide"]},
+       {h:"🗣️ Conversation kits",items:["Discovery call scripts","Qualification (MEDDIC/BANT)","Objection handling library"]},
+       {h:"⚔ Competitive",items:["Battlecards by competitor","Win/loss patterns","Positioning & messaging"]},
+       {h:"🔁 Process",items:["Deal stages & exit criteria","Handover to Implementation","Forecasting cadence"]}
+     ],chips:["Stage","Segment","Competitor","Region","Owner"]},
+  r:{title:"Deal & Client Records",sub:"The living memory of every account — controlled and searchable.",grad:"linear-gradient(135deg,#e11d63,#a21caf)",
+     libs:[
+       {h:"🗂️ Account files",items:["Account plans","Org charts & stakeholders","Contract & SOW copies"]},
+       {h:"🗒️ Activity",items:["Meeting & call notes","Email / proposal history","Next-step tracker"]},
+       {h:"🔍 Intelligence",items:["Competitive intel per deal","Pain points & requirements","Reference-ability status"]},
+       {h:"📊 Review",items:["Win/loss analysis","Pipeline snapshots","Quarterly business reviews"]}
+     ],chips:["Market","Deal stage","Value band","Owner","Confidentiality"]}
+};
+
+function openPillar(k){
+  const p=PILLARS[k];
+  document.getElementById("modalHead").style.background=p.grad;
+  document.getElementById("modalTitle").textContent=p.title;
+  document.getElementById("modalSub").textContent=p.sub;
+  document.getElementById("modalBody").innerHTML=`
+    <div class="lib-grid">
+      ${p.libs.map(l=>`<div class="lib"><h4>${l.h}</h4><ul>${l.items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`).join("")}
+    </div>
+    <div class="meta-note"><b>Metadata / filters on this library:</b><br>
+      ${p.chips.map(c=>`<span class="chip">${c}</span>`).join("")}
+    </div>
+    <div class="meta-note">Every file carries an owner, version history and a "latest approved" flag — so teams always grab the current, on-brand version, never a stale copy off someone's laptop.</div>`;
+  document.getElementById("overlay").classList.add("open");
+}
+function openMarket(name){
+  document.getElementById("modalHead").style.background="linear-gradient(135deg,#171a35,#2a1d54)";
+  document.getElementById("modalTitle").textContent=name+" workspace";
+  document.getElementById("modalSub").textContent="Local content that inherits everything from the global hub.";
+  document.getElementById("modalBody").innerHTML=`
+    <div class="lib-grid">
+      <div class="lib"><h4>🌐 Localised collateral</h4><ul><li>Decks & one-pagers in local language</li><li>Country-specific case studies</li><li>Regulatory / compliance notes</li></ul></div>
+      <div class="lib"><h4>＄ Local pricing</h4><ul><li>Currency-adjusted price book</li><li>Local tax & payment terms</li><li>Country discount limits</li></ul></div>
+      <div class="lib"><h4>🗂️ Active deals</h4><ul><li>Country pipeline & account plans</li><li>Local meeting notes</li><li>Partner / channel records</li></ul></div>
+      <div class="lib"><h4>👥 Team</h4><ul><li>Country Head + reps</li><li>Edit rights on local content</li><li>Read access to all global assets</li></ul></div>
+    </div>
+    <div class="meta-note">Markets with a Country Head (Philippines, Indonesia, Malaysia) own their workspace; regional markets (Singapore, Thailand, Vietnam) are run from SEA HQ. All inherit the global hub, so nothing is rebuilt from scratch.</div>`;
+  document.getElementById("overlay").classList.add("open");
+}
+function closeModal(){document.getElementById("overlay").classList.remove("open");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+
+/* tiny toast */
+let toastT;
+function toast(name){
+  clearTimeout(toastT);
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";
+    t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#111427;color:#fff;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:600;z-index:120;box-shadow:0 16px 40px rgba(0,0,0,.3)";
+    document.body.appendChild(t);}
+  t.textContent="📂 Opening: "+name+"  (prototype)";
+  t.style.opacity="1";
+  toastT=setTimeout(()=>{t.style.transition="opacity .4s";t.style.opacity="0";},1600);
+}
+
+renderDocs(DOCS);
+</script>
+</body>
+</html>

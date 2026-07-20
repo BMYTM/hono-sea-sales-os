@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HONO SEA Sales OS</title>
+<style>
+:root{
+  --ink:#0f1222;--ink-2:#3a3f5c;--muted:#6b7192;
+  --brand:#4f46e5;--brand-2:#7c3aed;--teal:#0ea5a4;--amber:#f59e0b;--rose:#e11d63;
+  --line:#e7e8f0;--bg:#f5f6fb;--card:#fff;--soft:#f0f1f9;
+  --ok:#16a34a;--warn:#d97706;--bad:#dc2626;
+  --shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);
+  --shadow-lg:0 24px 60px rgba(16,18,40,.18);--r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.side{background:#12132b;color:#c9cbe8;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;padding:6px 8px 16px}
+.brand .mark{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:800;box-shadow:0 6px 16px rgba(79,70,229,.4)}
+.brand .bn{font-weight:800;font-size:15px;color:#fff}
+.brand .bs{font-size:11px;color:#8b8fc4}
+.navlab{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6f74a8;padding:14px 10px 6px;font-weight:700}
+.nav{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;font-size:13.5px;font-weight:600;color:#c9cbe8;cursor:pointer;margin:2px 0;transition:background .12s,color .12s}
+.nav:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav.active{background:linear-gradient(135deg,rgba(79,70,229,.9),rgba(124,58,237,.85));color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.35)}
+.nav .ni{width:20px;text-align:center;font-size:15px}
+.side .whoami{margin-top:18px;padding:12px;border-radius:12px;background:rgba(255,255,255,.05);display:flex;gap:10px;align-items:center}
+.side .whoami .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5a4,#4f46e5);display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px}
+.side .whoami .wn{font-size:12.5px;font-weight:700;color:#fff}
+.side .whoami .ws{font-size:11px;color:#8b8fc4}
+
+/* ---------- main ---------- */
+main{padding:0;overflow:auto}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 26px;height:60px;display:flex;align-items:center;gap:16px}
+.crumb{font-size:13px;color:var(--muted);font-weight:600}
+.crumb b{color:var(--ink)}
+.tsearch{margin-left:auto;position:relative}
+.tsearch input{height:38px;width:280px;border:1px solid var(--line);border-radius:10px;padding:0 12px 0 34px;font-size:13px;outline:none;background:var(--card)}
+.tsearch svg{position:absolute;left:11px;top:11px;color:var(--muted)}
+.pill-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal);background:rgba(14,165,164,.1);padding:5px 10px;border-radius:999px}
+.pill-live .d{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.view{padding:26px}
+.vhead{margin-bottom:20px}
+.vhead h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.3px}
+.vhead p{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:720px}
+
+/* ---------- shared bits ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-h{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-h h3{margin:0;font-size:15px;font-weight:800}
+.card-h .sub{font-size:12px;color:var(--muted);font-weight:600}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.kpi .lab{font-size:12px;color:var(--muted);font-weight:600;display:flex;gap:7px;align-items:center}
+.kpi .ico{width:28px;height:28px;border-radius:8px;background:var(--soft);display:grid;place-items:center;color:var(--brand)}
+.kpi .val{font-size:25px;font-weight:800;margin-top:6px;letter-spacing:-.5px}
+.kpi .sub{font-size:12px;font-weight:700;margin-top:2px}
+.up{color:var(--ok)}.down{color:var(--bad)}.flat{color:var(--muted)}
+.btn{height:42px;padding:0 18px;border-radius:11px;font-weight:700;font-size:13.5px;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.soft{background:var(--soft);color:var(--ink-2)}
+.btn.soft:hover{background:#e7e8f5}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--ink-2);margin:0 0 6px}
+input.i,select.i,textarea.i{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;outline:none;background:#fff;font-family:inherit}
+input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(79,70,229,.1)}
+.row{display:grid;gap:14px}
+.row.two{grid-template-columns:1fr 1fr}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+.chk{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;transition:border .12s,background .12s}
+.chk:hover{border-color:var(--brand)}
+.chk.on{border-color:var(--brand);background:var(--soft)}
+.chk input{accent-color:var(--brand);width:16px;height:16px}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--ink-2);white-space:nowrap}
+.b-ok{background:rgba(22,163,74,.12);color:#15803d}
+.b-warn{background:rgba(217,119,6,.14);color:#b45309}
+.b-bad{background:rgba(220,38,38,.12);color:#b91c1c}
+.b-info{background:rgba(79,70,229,.12);color:#4338ca}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line)}
+td{padding:12px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--soft)}
+.bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),var(--brand))}
+.notice{display:flex;gap:11px;align-items:flex-start;background:rgba(14,165,164,.08);border:1px solid rgba(14,165,164,.25);color:#0b6b6a;border-radius:12px;padding:12px 15px;font-size:12.5px;font-weight:600;margin-bottom:18px}
+.notice .ni{font-size:16px}
+.muted{color:var(--muted)}
+.hr{height:1px;background:var(--line);margin:16px 0}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--ink-2);margin:2px 4px 2px 0}
+
+/* pipeline kanban */
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:start}
+.col{background:var(--soft);border-radius:14px;padding:10px}
+.col h4{margin:2px 4px 10px;font-size:12px;font-weight:800;display:flex;justify-content:space-between}
+.col h4 span{color:var(--muted);font-weight:700}
+.deal{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px;cursor:pointer;box-shadow:var(--shadow)}
+.deal:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.deal .dn{font-weight:800;font-size:12.5px}
+.deal .dm{font-size:11px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* meddicc */
+.meddicc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.md{border:1px solid var(--line);border-radius:12px;padding:12px}
+.md .mk{font-size:12px;font-weight:800}
+.md .mdd{font-size:11px;color:var(--muted);margin:3px 0 8px}
+.pips{display:flex;gap:5px}
+.pip{width:26px;height:9px;border-radius:5px;background:var(--soft);cursor:pointer;transition:background .12s}
+.pip.on{background:linear-gradient(90deg,var(--teal),var(--brand))}
+.gauge{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.stakeholder{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line)}
+.stakeholder:last-child{border-bottom:0}
+.sav{width:34px;height:34px;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-weight:800;font-size:12px;color:var(--ink-2)}
+.step{display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.snum{width:24px;height:24px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-weight:800;font-size:12px;flex:none;color:var(--brand)}
+
+/* funnel */
+.funnel{display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;align-items:center;gap:12px}
+.fbar{height:38px;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2));display:flex;align-items:center;padding:0 12px;color:#fff;font-weight:800;font-size:13px;min-width:90px}
+.flab{font-size:12.5px;font-weight:700;width:120px;flex:none}
+.fval{font-size:12.5px;font-weight:700;color:var(--ink-2);margin-left:auto}
+
+.proposal-preview{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pp-head{background:linear-gradient(120deg,#171a35,#2a1d54);color:#fff;padding:22px 24px}
+.pp-head .t{font-size:19px;font-weight:800}
+.pp-head .s{font-size:12.5px;opacity:.85;margin-top:4px}
+.pp-body{padding:22px 24px}
+.pp-body h4{margin:18px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--brand)}
+.pricetable td,.pricetable th{padding:10px 12px}
+.pp-total{display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:12px;padding:14px 18px;margin-top:14px}
+.pp-total .l{font-size:12px;color:var(--muted);font-weight:700}
+.pp-total .v{font-size:22px;font-weight:800}
+
+.link{color:var(--brand);font-weight:700;cursor:pointer;font-size:13px}
+.hide{display:none}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.tile .ti{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:20px}
+.tile h3{margin:13px 0 5px;font-size:16px;font-weight:800}
+.tile p{margin:0;font-size:12.5px;color:var(--muted)}
+.g-p{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.g-d{background:linear-gradient(135deg,#0ea5a4,#0891b2)}
+.g-b{background:linear-gradient(135deg,#f59e0b,#ef7d10)}
+.g-r{background:linear-gradient(135deg,#e11d63,#a21caf)}
+.g-c{background:linear-gradient(135deg,#334155,#0f172a)}
+.g-l{background:linear-gradient(135deg,#2563eb,#4f46e5)}
+
+@media(max-width:1000px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:248px;z-index:60;transform:translateX(-100%);transition:transform .2s}
+  .side.open{transform:none}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .grid3,.tiles{grid-template-columns:1fr}
+  .grid2,.row.two,.row.three,.meddicc{grid-template-columns:1fr}
+  .kanban{grid-template-columns:1fr;}
+  .tsearch{display:none}
+  .menu-btn{display:grid!important}
+}
+.menu-btn{display:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;place-items:center;cursor:pointer}
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55}
+.backdrop.open{display:block}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(16,18,40,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--bg);width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:18px;box-shadow:var(--shadow-lg)}
+.modal-h{padding:18px 22px;color:#fff;background:linear-gradient(135deg,#171a35,#2a1d54);position:relative}
+.modal-h h3{margin:0;font-size:17px}
+.modal-x{position:absolute;top:14px;right:16px;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.18);border:0;color:#fff;font-size:17px;cursor:pointer}
+.modal-b{padding:20px 22px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="mark">H</div>
+      <div><div class="bn">HONO Sales OS</div><div class="bs">SEA · Source of truth</div></div>
+    </div>
+    <div class="navlab">Overview</div>
+    <div class="nav active" data-v="home" onclick="go('home')"><span class="ni">🏠</span> Home</div>
+    <div class="nav" data-v="ceo" onclick="go('ceo')"><span class="ni">📈</span> CEO Review Dashboard</div>
+    <div class="navlab">Generate</div>
+    <div class="nav" data-v="proposal" onclick="go('proposal')"><span class="ni">📄</span> Proposal Generator</div>
+    <div class="nav" data-v="demand" onclick="go('demand')"><span class="ni">🎯</span> Demand Generator</div>
+    <div class="navlab">Sell &amp; Close</div>
+    <div class="nav" data-v="pipeline" onclick="go('pipeline')"><span class="ni">🔀</span> Pipeline (SEA)</div>
+    <div class="nav" data-v="account" onclick="go('account')"><span class="ni">🎖️</span> Account Strategy &amp; Closure</div>
+    <div class="navlab">Library</div>
+    <div class="nav" data-v="library" onclick="go('library')"><span class="ni">📚</span> Content Library</div>
+    <div class="whoami">
+      <div class="av">BM</div>
+      <div><div class="wn">Boonchoo Malhotra</div><div class="ws">SEA Business Head</div></div>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop" onclick="toggleMenu()"></div>
+
+  <!-- MAIN -->
+  <main>
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+      <div class="crumb" id="crumb"><b>Home</b></div>
+      <div class="tsearch">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input placeholder="Search the hub…"/>
+      </div>
+      <span class="pill-live"><span class="d"></span> Live</span>
+    </div>
+    <div class="view" id="view"></div>
+  </main>
+</div>
+
+<!-- generic modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-h"><button class="modal-x" onclick="closeModal()">×</button><h3 id="mTitle">Detail</h3></div>
+    <div class="modal-b" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================= DATA */
+const fmt = n => n>=1e6 ? '$'+(n/1e6).toFixed(2).replace(/\.00$/,'')+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n);
+const num = n => n.toLocaleString('en-US');
+
+const MARKETS = [
+  {c:'Philippines', flag:'🇵🇭', head:'Country Head', quota:1400000, closed:980000},
+  {c:'Indonesia',   flag:'🇮🇩', head:'Country Head', quota:1600000, closed:1180000},
+  {c:'Malaysia',    flag:'🇲🇾', head:'Country Head', quota:1200000, closed:760000},
+  {c:'Singapore',   flag:'🇸🇬', head:'SEA HQ',       quota:700000,  closed:300000},
+  {c:'Thailand',    flag:'🇹🇭', head:'SEA HQ',       quota:500000,  closed:210000},
+  {c:'Vietnam',     flag:'🇻🇳', head:'SEA HQ',       quota:450000,  closed:150000},
+];
+
+const STAGES = [
+  {k:'Qualify',     p:0.10},
+  {k:'Discovery',   p:0.25},
+  {k:'Proposal',    p:0.50},
+  {k:'Negotiation', p:0.70},
+  {k:'Closing',     p:0.90},
+];
+const stageProb = k => (STAGES.find(s=>s.k===k)||{p:0}).p;
+
+// read-only mirror of SEA dashboard (illustrative)
+const DEALS = [
+  {id:'D1', acct:'Mega Retail Group',   mkt:'Indonesia',   stage:'Negotiation', value:420000, emp:6800, ind:'Retail',      owner:'ID Team',  close:'2026-08-30', health:78},
+  {id:'D2', acct:'IslandBank',          mkt:'Philippines', stage:'Proposal',    value:360000, emp:5200, ind:'Banking',     owner:'PH Team',  close:'2026-09-15', health:64},
+  {id:'D3', acct:'Peninsula Manuf.',    mkt:'Malaysia',    stage:'Closing',     value:280000, emp:4100, ind:'Manufacturing',owner:'MY Team', close:'2026-08-12', health:82},
+  {id:'D4', acct:'Nusantara Logistics', mkt:'Indonesia',   stage:'Discovery',   value:240000, emp:3600, ind:'Logistics',   owner:'ID Team',  close:'2026-10-05', health:48},
+  {id:'D5', acct:'Metro Health System', mkt:'Philippines', stage:'Proposal',    value:310000, emp:4700, ind:'Healthcare',  owner:'PH Team',  close:'2026-09-28', health:57},
+  {id:'D6', acct:'Lion City FinServ',   mkt:'Singapore',   stage:'Negotiation', value:190000, emp:1900, ind:'Financial',   owner:'SEA HQ',   close:'2026-08-22', health:70},
+  {id:'D7', acct:'Siam Agro Holdings',  mkt:'Thailand',    stage:'Qualify',     value:150000, emp:2400, ind:'Agriculture', owner:'SEA HQ',   close:'2026-11-10', health:35},
+  {id:'D8', acct:'Delta Textiles',      mkt:'Vietnam',     stage:'Discovery',   value:130000, emp:2100, ind:'Manufacturing',owner:'SEA HQ',  close:'2026-10-20', health:44},
+  {id:'D9', acct:'Palm Estates Bhd',    mkt:'Malaysia',    stage:'Proposal',    value:220000, emp:3300, ind:'Plantation',  owner:'MY Team',  close:'2026-09-08', health:60},
+  {id:'D10',acct:'Archipelago Telco',   mkt:'Indonesia',   stage:'Closing',     value:390000, emp:5900, ind:'Telecom',     owner:'ID Team',  close:'2026-08-05', health:85},
+  {id:'D11',acct:'Sunrise BPO',         mkt:'Philippines', stage:'Qualify',     value:170000, emp:2600, ind:'BPO',         owner:'PH Team',  close:'2026-11-18', health:38},
+  {id:'D12',acct:'Harborfront Group',   mkt:'Singapore',   stage:'Discovery',   value:160000, emp:1500, ind:'Real Estate', owner:'SEA HQ',   close:'2026-10-12', health:52},
+];
+
+const MODULES = [
+  {k:'core',    n:'Core HR',      pepm:2.0},
+  {k:'payroll', n:'Payroll',      pepm:2.5},
+  {k:'attend',  n:'Attendance',   pepm:1.5},
+  {k:'leave',   n:'Leave',        pepm:1.0},
+  {k:'perf',    n:'Performance',  pepm:1.8},
+  {k:'recruit', n:'Recruitment',  pepm:2.2},
+  {k:'ess',     n:'ESS / MSS',    pepm:1.0},
+];
+const TIERS = {Standard:1.0, Professional:1.15, Enterprise:1.30};
+const TERMS = {'1 year':0, '2 years':0.08, '3 years':0.15};
+
+const MEDDICC = [
+  {k:'Metrics',          d:'Quantified business value / ROI agreed'},
+  {k:'Economic Buyer',   d:'Access to who signs & owns budget'},
+  {k:'Decision Criteria',d:'We know how they will decide'},
+  {k:'Decision Process', d:'Steps, dates & approvals mapped'},
+  {k:'Identify Pain',    d:'Compelling, urgent pain confirmed'},
+  {k:'Champion',         d:'Internal seller with power & access'},
+  {k:'Competition',      d:'Competitive position understood'},
+];
+
+/* ============================================================= ROUTER */
+const CRUMBS = {home:'Home', ceo:'CEO Review Dashboard', proposal:'Proposal Generator', demand:'Demand Generator', pipeline:'Pipeline (SEA)', account:'Account Strategy & Closure', library:'Content Library'};
+function go(v){
+  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active', n.dataset.v===v));
+  document.getElementById('crumb').innerHTML = '<b>'+CRUMBS[v]+'</b>';
+  document.getElementById('view').innerHTML = VIEWS[v]();
+  if(AFTER[v]) AFTER[v]();
+  document.querySelector('main').scrollTop=0;
+  if(window.innerWidth<=1000) closeMenu();
+}
+function toggleMenu(){document.getElementById('side').classList.toggle('open');document.getElementById('backdrop').classList.toggle('open');}
+function closeMenu(){document.getElementById('side').classList.remove('open');document.getElementById('backdrop').classList.remove('open');}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function openModal(title,html){document.getElementById('mTitle').textContent=title;document.getElementById('mBody').innerHTML=html;document.getElementById('overlay').classList.add('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+const VIEWS={}, AFTER={};
+
+/* ============================================================= HOME */
+VIEWS.home = () => {
+  const totalPipe = DEALS.reduce((a,d)=>a+d.value,0);
+  const weighted = DEALS.reduce((a,d)=>a+d.value*stageProb(d.stage),0);
+  const quota = MARKETS.reduce((a,m)=>a+m.quota,0);
+  const closed = MARKETS.reduce((a,m)=>a+m.closed,0);
+  return `
+  <div class="vhead">
+    <h1>HONO SEA Sales Operating System</h1>
+    <p>One workspace to generate demand, build proposals, run the pipeline and close accounts — the single source of truth for SEA sales, feeding the CEO review dashboard.</p>
+  </div>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi"><div class="lab"><span class="ico">📊</span> Open pipeline</div><div class="val">${fmt(totalPipe)}</div><div class="sub up">▲ 12% QoQ</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">🎯</span> Weighted forecast</div><div class="val">${fmt(weighted)}</div><div class="sub flat">stage-weighted</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">✅</span> Closed vs quota</div><div class="val">${Math.round(closed/quota*100)}%</div><div class="sub up">${fmt(closed)} / ${fmt(quota)}</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">🔥</span> Open deals</div><div class="val">${DEALS.length}</div><div class="sub flat">across 6 markets</div></div>
+  </div>
+  <div class="card-h" style="border:0;padding:0 2px 12px"><h3 style="font-size:17px">Jump into a module</h3></div>
+  <div class="tiles">
+    <div class="tile" onclick="go('proposal')"><div class="ti g-p">📄</div><h3>Proposal Generator</h3><p>Configure modules, headcount and term → instant, on-brand proposal with live pricing.</p></div>
+    <div class="tile" onclick="go('demand')"><div class="ti g-d">🎯</div><h3>Demand Generator</h3><p>Build a campaign and project the funnel from target accounts to booked pipeline.</p></div>
+    <div class="tile" onclick="go('pipeline')"><div class="ti g-l">🔀</div><h3>Pipeline (SEA)</h3><p>Read-only mirror of the SEA dashboard — stages, weighted forecast and deals.</p></div>
+    <div class="tile" onclick="go('account')"><div class="ti g-r">🎖️</div><h3>Account Strategy &amp; Closure</h3><p>MEDDICC health, stakeholder map and a mutual close plan for every key deal.</p></div>
+    <div class="tile" onclick="go('ceo')"><div class="ti g-c">📈</div><h3>CEO Review Dashboard</h3><p>Executive rollup: market quota attainment, forecast, top deals and risks.</p></div>
+    <div class="tile" onclick="go('library')"><div class="ti g-b">📚</div><h3>Content Library</h3><p>Proposals, decks, playbooks and client records — governed and searchable.</p></div>
+  </div>
+  <div class="notice" style="margin-top:20px"><span class="ni">🔒</span><div>The <b>Pipeline</b> and <b>CEO Dashboard</b> read from the existing SEA Dashboard as the source of record. This system displays and works on top of that data — it never overwrites it.</div></div>`;
+};
+
+/* ============================================================= PROPOSAL GENERATOR */
+let PST = {client:'', mkt:'Indonesia', ind:'Retail', emp:2000, mods:{core:true,payroll:true,attend:true,leave:true,perf:false,recruit:false,ess:true}, tier:'Professional', term:'2 years'};
+VIEWS.proposal = () => `
+  <div class="vhead"><h1>Proposal Generator</h1><p>Fill the deal parameters and generate a ready-to-send proposal with computed commercials. Pricing uses placeholder HONO per-employee-per-month rates — swap for your live price book.</p></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h"><h3>Deal parameters</h3></div>
+      <div style="padding:18px">
+        <div class="row two">
+          <div><label class="f">Client name</label><input class="i" id="p_client" placeholder="e.g. Mega Retail Group" oninput="PST.client=this.value"></div>
+          <div><label class="f">Headcount</label><input class="i" id="p_emp" type="number" value="${PST.emp}" oninput="PST.emp=+this.value||0"></div>
+        </div>
+        <div class="row three" style="margin-top:14px">
+          <div><label class="f">Market</label><select class="i" id="p_mkt" onchange="PST.mkt=this.value">${MARKETS.map(m=>`<option ${m.c===PST.mkt?'selected':''}>${m.c}</option>`).join('')}</select></div>
+          <div><label class="f">Tier</label><select class="i" onchange="PST.tier=this.value">${Object.keys(TIERS).map(t=>`<option ${t===PST.tier?'selected':''}>${t}</option>`).join('')}</select></div>
+          <div><label class="f">Term</label><select class="i" onchange="PST.term=this.value">${Object.keys(TERMS).map(t=>`<option ${t===PST.term?'selected':''}>${t}</option>`).join('')}</select></div>
+        </div>
+        <div style="margin-top:14px"><label class="f">Industry</label><input class="i" value="${PST.ind}" oninput="PST.ind=this.value"></div>
+        <label class="f" style="margin-top:16px">Modules</label>
+        <div class="row two" id="modBox">
+          ${MODULES.map(m=>`<label class="chk ${PST.mods[m.k]?'on':''}"><input type="checkbox" ${PST.mods[m.k]?'checked':''} onchange="PST.mods['${m.k}']=this.checked;this.closest('.chk').classList.toggle('on',this.checked)"> ${m.n} <span class="muted" style="margin-left:auto;font-weight:700">$${m.pepm.toFixed(1)}</span></label>`).join('')}
+        </div>
+        <button class="btn primary" style="margin-top:18px;width:100%" onclick="genProposal()">⚡ Generate proposal</button>
+      </div>
+    </div>
+    <div id="ppOut"><div class="card"><div style="padding:40px 24px;text-align:center;color:var(--muted)"><div style="font-size:34px">📄</div><p style="margin:10px 0 0">Your proposal preview appears here.</p></div></div></div>
+  </div>`;
+function calcPricing(){
+  const pepm = MODULES.filter(m=>PST.mods[m.k]).reduce((a,m)=>a+m.pepm,0);
+  const tier = TIERS[PST.tier], disc = TERMS[PST.term];
+  const years = parseInt(PST.term);
+  const monthly = pepm*tier*PST.emp;
+  const annualList = monthly*12;
+  const tcv = annualList*years*(1-disc);
+  const acv = tcv/years;
+  return {pepm,tier,disc,years,monthly,annualList,tcv,acv};
+}
+function genProposal(){
+  if(!PST.client.trim()){openModal('Add a client name','<p class="muted">Enter the client name to generate the proposal.</p>');return;}
+  const sel = MODULES.filter(m=>PST.mods[m.k]);
+  if(!sel.length){openModal('Select modules','<p class="muted">Pick at least one module.</p>');return;}
+  const c = calcPricing();
+  document.getElementById('ppOut').innerHTML = `
+  <div class="proposal-preview">
+    <div class="pp-head"><div class="t">HRMS Proposal — ${PST.client}</div><div class="s">${PST.mkt} · ${PST.ind} · ${num(PST.emp)} employees · ${PST.tier} · ${PST.term}</div></div>
+    <div class="pp-body">
+      <h4>Executive summary</h4>
+      <p style="font-size:13px;margin:0">HONO proposes a ${PST.tier}-tier HRMS deployment for <b>${PST.client}</b>, covering ${num(PST.emp)} employees across ${PST.mkt}. The solution digitises core people processes, cuts manual effort and gives leadership real-time workforce visibility, delivered on a ${PST.term} agreement.</p>
+      <h4>Scope of modules</h4>
+      <table class="pricetable"><thead><tr><th>Module</th><th style="text-align:right">Rate (PEPM)</th><th style="text-align:right">Annual</th></tr></thead><tbody>
+      ${sel.map(m=>`<tr><td>${m.n}</td><td style="text-align:right">$${(m.pepm*c.tier).toFixed(2)}</td><td style="text-align:right">${fmt(m.pepm*c.tier*PST.emp*12)}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="pp-total"><div><div class="l">Annual contract value (ACV)</div><div class="v">${fmt(c.acv)}</div></div><div style="text-align:right"><div class="l">Total contract value (${c.years}yr${c.disc?`, ${Math.round(c.disc*100)}% term discount`:''})</div><div class="v">${fmt(c.tcv)}</div></div></div>
+      <h4>Why HONO</h4>
+      <p style="font-size:13px;margin:0">Regional HRMS proven across SEA, local support, and a rollout methodology with UAT sign-off and user manuals per module.</p>
+      <div class="hr"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" onclick="openModal('Export proposal','<p>In the live system this hands off to the HONO proposal builder to produce a branded <b>.docx</b> in the client folder, then files it under <b>Proposals &amp; Pricing → ${PST.mkt}</b>.</p>')">📥 Export to Word (.docx)</button>
+        <button class="btn soft" onclick="openModal('Saved','<p>Proposal for <b>${PST.client}</b> saved to the Content Library and linked to the account in Pipeline.</p>')">💾 Save to hub</button>
+      </div>
+      <p class="muted" style="font-size:11.5px;margin-top:12px">Illustrative pricing — replace placeholder PEPM rates with your live SEA price book.</p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================= DEMAND GENERATOR */
+let DST={mkt:'Indonesia', seg:'Mid-market (1k–5k emp)', ind:'Retail & Distribution', type:'Webinar + LinkedIn', targets:120, deal:220000};
+const DTYPES={
+  'Webinar + LinkedIn':{mql:0.18, sql:0.35, opp:0.55, win:0.28, mix:'40% LinkedIn ABM · 35% Webinar · 25% Email nurture'},
+  'Email nurture':      {mql:0.10, sql:0.30, opp:0.50, win:0.25, mix:'70% Email sequences · 30% Retargeting'},
+  'Field event':        {mql:0.25, sql:0.42, opp:0.60, win:0.32, mix:'50% Roundtable · 30% Follow-up calls · 20% Partner'},
+  'Partner / channel':  {mql:0.22, sql:0.45, opp:0.62, win:0.34, mix:'60% Partner-sourced · 40% Co-marketing'},
+};
+VIEWS.demand = () => `
+  <div class="vhead"><h1>Demand Generator</h1><p>Design a campaign for a market and segment, then project the funnel from target accounts through to booked pipeline. Conversion rates are benchmarks you can tune.</p></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h"><h3>Campaign setup</h3></div>
+      <div style="padding:18px">
+        <div class="row two">
+          <div><label class="f">Market</label><select class="i" onchange="DST.mkt=this.value">${MARKETS.map(m=>`<option ${m.c===DST.mkt?'selected':''}>${m.c}</option>`).join('')}</select></div>
+          <div><label class="f">Campaign type</label><select class="i" onchange="DST.type=this.value">${Object.keys(DTYPES).map(t=>`<option ${t===DST.type?'selected':''}>${t}</option>`).join('')}</select></div>
+        </div>
+        <div style="margin-top:14px"><label class="f">Target segment</label><input class="i" value="${DST.seg}" oninput="DST.seg=this.value"></div>
+        <div style="margin-top:14px"><label class="f">Target industry</label><input class="i" value="${DST.ind}" oninput="DST.ind=this.value"></div>
+        <div class="row two" style="margin-top:14px">
+          <div><label class="f">Target accounts</label><input class="i" type="number" value="${DST.targets}" oninput="DST.targets=+this.value||0"></div>
+          <div><label class="f">Avg. deal size</label><input class="i" type="number" value="${DST.deal}" oninput="DST.deal=+this.value||0"></div>
+        </div>
+        <button class="btn primary" style="margin-top:18px;width:100%" onclick="genDemand()">⚡ Build campaign &amp; project funnel</button>
+      </div>
+    </div>
+    <div id="dmOut"><div class="card"><div style="padding:40px 24px;text-align:center;color:var(--muted)"><div style="font-size:34px">🎯</div><p style="margin:10px 0 0">Your campaign plan and funnel projection appear here.</p></div></div></div>
+  </div>`;
+function genDemand(){
+  const r=DTYPES[DST.type];
+  const T=DST.targets;
+  const mql=Math.round(T*r.mql), sql=Math.round(mql*r.sql), opp=Math.round(sql*r.opp), won=Math.max(1,Math.round(opp*r.win));
+  const pipe=opp*DST.deal, book=won*DST.deal;
+  const steps=[['Target accounts',T],['Engaged / MQL',mql],['Sales-qualified (SQL)',sql],['Opportunities',opp],['Closed-won',won]];
+  const max=T;
+  document.getElementById('dmOut').innerHTML=`
+  <div class="card">
+    <div class="card-h"><h3>${DST.type} — ${DST.mkt}</h3><span class="sub">${DST.seg}</span></div>
+    <div style="padding:18px">
+      <div class="grid2" style="gap:12px;margin-bottom:16px">
+        <div class="kpi" style="box-shadow:none"><div class="lab">Projected pipeline</div><div class="val">${fmt(pipe)}</div><div class="sub up">${opp} opps × ${fmt(DST.deal)}</div></div>
+        <div class="kpi" style="box-shadow:none"><div class="lab">Projected bookings</div><div class="val">${fmt(book)}</div><div class="sub flat">${won} wins @ ${Math.round(r.win*100)}% win</div></div>
+      </div>
+      <label class="f">Funnel projection</label>
+      <div class="funnel">
+        ${steps.map(([l,v],i)=>`<div class="frow"><div class="flab">${l}</div><div class="fbar" style="width:${Math.max(14,Math.round(v/max*100))}%">${num(v)}</div><div class="fval">${i>0?Math.round(v/steps[i-1][1]*100)+'% →':''}</div></div>`).join('')}
+      </div>
+      <div class="hr"></div>
+      <label class="f">Recommended channel mix</label>
+      <p style="font-size:13px;margin:0 0 12px">${r.mix}</p>
+      <label class="f">Pull these assets from the library</label>
+      <div>${['Industry pitch deck','ROI calculator','Relevant case study','Battlecard','Email nurture sequence'].map(a=>`<span class="tag">${a}</span>`).join('')}</div>
+      <div class="hr"></div>
+      <button class="btn primary" onclick="openModal('Campaign launched','<p>Campaign brief saved. In the live system this creates the target-account list, drafts the sequence, and books MQLs straight into the Pipeline as new Qualify-stage deals.</p>')">🚀 Launch &amp; sync to pipeline</button>
+      <p class="muted" style="font-size:11.5px;margin-top:12px">Benchmarks are editable — calibrate against your actual SEA conversion history.</p>
+    </div>
+  </div>`;
+}
+
+/* ============================================================= PIPELINE (read-only mirror) */
+VIEWS.pipeline = () => {
+  const total=DEALS.reduce((a,d)=>a+d.value,0);
+  const weighted=DEALS.reduce((a,d)=>a+d.value*stageProb(d.stage),0);
+  const cols=STAGES.map(s=>{
+    const ds=DEALS.filter(d=>d.stage===s.k);
+    const val=ds.reduce((a,d)=>a+d.value,0);
+    return `<div class="col"><h4>${s.k} <span>${fmt(val)}</span></h4>
+      ${ds.map(d=>`<div class="deal" onclick="openDeal('${d.id}')"><div class="dn">${d.acct}</div><div class="dm"><span>${d.mkt}</span><span>${fmt(d.value)}</span></div><div class="dm"><span><span class="dot" style="background:${healthColor(d.health)}"></span> ${d.health}% health</span><span>${d.close.slice(5)}</span></div></div>`).join('')||'<div class="muted" style="font-size:12px;padding:6px">—</div>'}
+    </div>`;
+  }).join('');
+  return `
+  <div class="vhead"><h1>Pipeline — SEA</h1><p>Live view of every open deal across the region, grouped by stage with stage-weighted forecasting.</p></div>
+  <div class="notice"><span class="ni">🔒</span><div><b>Read-only mirror of the SEA Dashboard.</b> This is the source of record — deals are displayed and analysed here but edited in the SEA Dashboard. Nothing on this screen writes back.</div></div>
+  <div class="grid4" style="margin-bottom:18px">
+    <div class="kpi"><div class="lab">Open pipeline</div><div class="val">${fmt(total)}</div></div>
+    <div class="kpi"><div class="lab">Weighted forecast</div><div class="val">${fmt(weighted)}</div></div>
+    <div class="kpi"><div class="lab">Open deals</div><div class="val">${DEALS.length}</div></div>
+    <div class="kpi"><div class="lab">Avg. deal size</div><div class="val">${fmt(total/DEALS.length)}</div></div>
+  </div>
+  <label class="f">Pipeline board</label>
+  <div class="kanban">${cols}</div>`;
+};
+function healthColor(h){return h>=70?'#16a34a':h>=50?'#d97706':'#dc2626';}
+function openDeal(id){
+  const d=DEALS.find(x=>x.id===id);
+  openModal(d.acct, `
+    <div class="grid2" style="gap:10px">
+      <div class="kpi" style="box-shadow:none"><div class="lab">Value</div><div class="val" style="font-size:20px">${fmt(d.value)}</div></div>
+      <div class="kpi" style="box-shadow:none"><div class="lab">Health</div><div class="val" style="font-size:20px;color:${healthColor(d.health)}">${d.health}%</div></div>
+    </div>
+    <div class="hr"></div>
+    <table><tbody>
+      <tr><td class="muted">Market</td><td style="text-align:right;font-weight:700">${d.mkt}</td></tr>
+      <tr><td class="muted">Stage</td><td style="text-align:right;font-weight:700">${d.stage} · ${Math.round(stageProb(d.stage)*100)}% prob</td></tr>
+      <tr><td class="muted">Industry</td><td style="text-align:right;font-weight:700">${d.ind}</td></tr>
+      <tr><td class="muted">Employees</td><td style="text-align:right;font-weight:700">${num(d.emp)}</td></tr>
+      <tr><td class="muted">Owner</td><td style="text-align:right;font-weight:700">${d.owner}</td></tr>
+      <tr><td class="muted">Close date</td><td style="text-align:right;font-weight:700">${d.close}</td></tr>
+    </tbody></table>
+    <div class="hr"></div>
+    <button class="btn primary" style="width:100%" onclick="closeModal();go('account');setTimeout(()=>selectAccount('${d.id}'),30)">🎖️ Open account strategy &amp; close plan →</button>
+    <p class="muted" style="font-size:11.5px;margin-top:10px;text-align:center">Read-only mirror — edits happen in the SEA Dashboard.</p>`);
+}
+
+/* ============================================================= ACCOUNT STRATEGY & CLOSURE */
+let ACC={id:'D1', scores:{}};
+function seedScores(d){
+  // derive starting MEDDICC scores from health so it feels populated
+  const base=Math.round(d.health/100*21);
+  const s={}; let left=base;
+  MEDDICC.forEach((m,i)=>{const v=Math.max(0,Math.min(3, Math.round(left/(MEDDICC.length-i)))); s[m.k]=v; left-=v;});
+  return s;
+}
+function selectAccount(id){ACC.id=id; ACC.scores=seedScores(DEALS.find(d=>d.id===id)); go('account');}
+VIEWS.account = () => {
+  const d=DEALS.find(x=>x.id===ACC.id);
+  if(!ACC.scores||!Object.keys(ACC.scores).length) ACC.scores=seedScores(d);
+  const picker=`<select class="i" style="max-width:280px" onchange="selectAccount(this.value)">${DEALS.map(x=>`<option value="${x.id}" ${x.id===ACC.id?'selected':''}>${x.acct} — ${x.mkt}</option>`).join('')}</select>`;
+  return `
+  <div class="vhead"><h1>Account Strategy &amp; Closure</h1><p>The method for closing at account level: score the deal on MEDDICC, map the buying group, and drive a mutual close plan. Health recalculates as you score — this is how we make closure a process, not a guess.</p></div>
+  <div style="margin-bottom:16px">${picker}</div>
+  <div class="grid2">
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-h"><h3>MEDDICC qualification</h3><span class="sub">click the pips to score 0–3</span></div>
+        <div style="padding:16px"><div class="meddicc" id="meddiccBox">${meddiccHtml()}</div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>Mutual close plan</h3><span class="sub">${d.acct}</span></div>
+        <div style="padding:16px" id="closePlan">${closePlanHtml(d)}</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-h"><h3>Deal health</h3></div>
+        <div style="padding:20px;text-align:center" id="healthGauge">${gaugeHtml()}</div>
+      </div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-h"><h3>Buying group</h3></div>
+        <div style="padding:6px 16px">
+          ${[['CFO','Economic buyer','b-info','Aligned on ROI — champion'],['HR Director','Decision maker','b-ok','Strong champion'],['IT Head','Technical evaluator','b-warn','Neutral — security review pending'],['CEO','Executive sponsor','b-warn','Not yet engaged']].map(([n,r,c,note])=>`<div class="stakeholder"><div class="sav">${n.split(' ').map(w=>w[0]).join('')}</div><div style="flex:1"><div style="font-weight:800;font-size:13px">${n} <span class="badge ${c}" style="margin-left:6px">${r}</span></div><div class="muted" style="font-size:11.5px;margin-top:2px">${note}</div></div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>Risks &amp; next best action</h3></div>
+        <div style="padding:16px" id="nba">${nbaHtml(d)}</div>
+      </div>
+    </div>
+  </div>`;
+};
+function accScore(){return Object.values(ACC.scores).reduce((a,b)=>a+b,0);}
+function accHealth(){return Math.round(accScore()/21*100);}
+function meddiccHtml(){
+  return MEDDICC.map(m=>{
+    const v=ACC.scores[m.k]||0;
+    return `<div class="md"><div class="mk">${m.k}</div><div class="mdd">${m.d}</div><div class="pips">${[1,2,3].map(i=>`<div class="pip ${i<=v?'on':''}" onclick="setScore('${m.k}',${i})"></div>`).join('')}</div></div>`;
+  }).join('');
+}
+function setScore(k,i){ ACC.scores[k] = (ACC.scores[k]===i)?i-1:i; document.getElementById('meddiccBox').innerHTML=meddiccHtml(); document.getElementById('healthGauge').innerHTML=gaugeHtml(); }
+function gaugeHtml(){
+  const h=accHealth(), col=healthColor(h), R=52, C=2*Math.PI*R, off=C*(1-h/100);
+  const label = h>=70?'On track to close':h>=50?'Needs work':'At risk';
+  return `<svg width="150" height="150" viewBox="0 0 130 130">
+    <circle cx="65" cy="65" r="${R}" fill="none" stroke="#eceef7" stroke-width="14"/>
+    <circle cx="65" cy="65" r="${R}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 65 65)"/>
+    <text x="65" y="60" text-anchor="middle" font-size="26" font-weight="800" fill="#0f1222">${h}%</text>
+    <text x="65" y="80" text-anchor="middle" font-size="10" fill="#6b7192">MEDDICC ${accScore()}/21</text>
+  </svg>
+  <div style="margin-top:8px;font-weight:800;color:${col}">${label}</div>`;
+}
+function closePlanHtml(d){
+  const steps=[
+    ['Confirm compelling event &amp; metrics','Champion + CFO','Owner: AE'],
+    ['Solution demo to buying group','HR + IT','Owner: Presales'],
+    ['Commercial proposal &amp; ROI review','CFO','Owner: AE'],
+    ['Security / technical validation','IT Head','Owner: Solutions'],
+    ['Legal &amp; procurement','Procurement','Owner: AE'],
+    ['Signature &amp; kickoff → Implementation','Economic buyer','Owner: Country Head'],
+  ];
+  return steps.map((s,i)=>`<div class="step"><div class="snum">${i+1}</div><div><div style="font-weight:700;font-size:13px">${s[0]}</div><div class="muted" style="font-size:11.5px;margin-top:2px">${s[1]} · ${s[2]}</div></div></div>`).join('')
+   + `<div class="hr"></div><button class="btn primary" style="width:100%" onclick="openModal('Close plan shared','<p>Mutual close plan for <b>${d.acct}</b> shared with the champion and logged against the deal. Progress feeds the CEO dashboard.</p>')">🤝 Share mutual close plan</button>`;
+}
+function nbaHtml(d){
+  const h=accHealth();
+  const gaps=MEDDICC.filter(m=>(ACC.scores[m.k]||0)<2).map(m=>m.k);
+  const risk = h<50?'b-bad':h<70?'b-warn':'b-ok';
+  return `
+    <div style="margin-bottom:10px"><span class="badge ${risk}">${h<50?'High risk':h<70?'Moderate risk':'Healthy'}</span> <span class="muted" style="font-size:12px">closes ${d.close}</span></div>
+    <label class="f">Weakest MEDDICC areas</label>
+    <div style="margin-bottom:12px">${gaps.length?gaps.map(g=>`<span class="tag">${g}</span>`).join(''):'<span class="muted" style="font-size:12.5px">All areas solid.</span>'}</div>
+    <label class="f">Next best action</label>
+    <p style="font-size:13px;margin:0">${gaps.includes('Economic Buyer')?'Secure a meeting with the economic buyer (CFO) to confirm budget and ROI.':gaps.includes('Champion')?'Develop and arm a stronger internal champion before advancing.':gaps.includes('Competition')?'Run the competitive battlecard and lock in differentiation.':'Drive the close plan — push for the commercial review and a signature date.'}</p>`;
+}
+
+/* ============================================================= CEO DASHBOARD */
+VIEWS.ceo = () => {
+  const totalQuota=MARKETS.reduce((a,m)=>a+m.quota,0);
+  const totalClosed=MARKETS.reduce((a,m)=>a+m.closed,0);
+  const totalPipe=DEALS.reduce((a,d)=>a+d.value,0);
+  const weighted=DEALS.reduce((a,d)=>a+d.value*stageProb(d.stage),0);
+  const forecast=totalClosed+weighted;
+  const top=[...DEALS].sort((a,b)=>b.value-a.value).slice(0,5);
+  const risks=DEALS.filter(d=>d.health<50);
+  return `
+  <div class="vhead"><h1>CEO Review Dashboard</h1><p>Executive rollup for the SEA region — quota attainment, weighted forecast, biggest deals and where the risk sits. Reads from the SEA Dashboard as source of record.</p></div>
+  <div class="notice"><span class="ni">🔒</span><div>Read-only executive view. Figures roll up live from the Pipeline mirror and market quotas — no data is edited here.</div></div>
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="kpi"><div class="lab"><span class="ico">✅</span> Closed vs quota</div><div class="val">${Math.round(totalClosed/totalQuota*100)}%</div><div class="sub up">${fmt(totalClosed)} / ${fmt(totalQuota)}</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">📈</span> Forecast (closed+weighted)</div><div class="val">${fmt(forecast)}</div><div class="sub ${forecast>=totalQuota?'up':'down'}">${Math.round(forecast/totalQuota*100)}% of quota</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">📊</span> Open pipeline</div><div class="val">${fmt(totalPipe)}</div><div class="sub flat">${DEALS.length} deals</div></div>
+    <div class="kpi"><div class="lab"><span class="ico">⚠️</span> At-risk value</div><div class="val">${fmt(risks.reduce((a,d)=>a+d.value,0))}</div><div class="sub down">${risks.length} deals &lt;50% health</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h"><h3>Market performance vs quota</h3></div>
+      <div style="padding:8px 18px 16px">
+        ${MARKETS.map(m=>{const pct=Math.round(m.closed/m.quota*100);return `<div style="padding:11px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700">${m.flag} ${m.c} <span class="muted" style="font-weight:600">· ${m.head}</span></span><span style="font-weight:800;color:${pct>=75?'var(--ok)':pct>=50?'var(--warn)':'var(--bad)'}">${pct}%</span></div><div class="bar"><i style="width:${Math.min(100,pct)}%"></i></div><div class="muted" style="font-size:11px;margin-top:4px">${fmt(m.closed)} of ${fmt(m.quota)}</div></div>`;}).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-h"><h3>Top deals</h3><span class="sub">by value</span></div>
+        <table><tbody>
+          ${top.map(d=>`<tr onclick="openDeal('${d.id}')" style="cursor:pointer"><td><div style="font-weight:700">${d.acct}</div><div class="muted" style="font-size:11px">${d.mkt} · ${d.stage}</div></td><td style="text-align:right;font-weight:800">${fmt(d.value)}</td><td style="text-align:right"><span class="badge" style="background:${healthColor(d.health)}22;color:${healthColor(d.health)}">${d.health}%</span></td></tr>`).join('')}
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>Deals needing attention</h3><span class="sub">&lt;50% health</span></div>
+        <table><tbody>
+          ${risks.map(d=>`<tr onclick="selectAccount('${d.id}')" style="cursor:pointer"><td><div style="font-weight:700">${d.acct}</div><div class="muted" style="font-size:11px">${d.mkt} · closes ${d.close.slice(5)}</div></td><td style="text-align:right;font-weight:800">${fmt(d.value)}</td><td style="text-align:right"><span class="badge b-bad">${d.health}%</span></td></tr>`).join('')||'<tr><td class="muted">No at-risk deals 🎉</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* ============================================================= LIBRARY */
+const PILLARS_L=[
+  {k:'p',ico:'📄',g:'g-p',t:'Proposals & Pricing',n:168,d:'Approved templates, price books, discount rules, ROI calculators.'},
+  {k:'d',ico:'🎞️',g:'g-d',t:'Decks & Collateral',n:214,d:'Pitch decks, one-pagers, case studies, brochures, demo videos.'},
+  {k:'b',ico:'📘',g:'g-b',t:'Playbooks & Process',n:96,d:'GTM playbooks, discovery scripts, objection handling, battlecards.'},
+  {k:'r',ico:'🗂️',g:'g-r',t:'Deal & Client Records',n:164,d:'Account plans, meeting notes, competitive intel, win/loss reviews.'},
+];
+VIEWS.library = () => `
+  <div class="vhead"><h1>Content Library</h1><p>Four governed pillars on SharePoint — one source of truth for every sales asset, reused and localised across markets.</p></div>
+  <div class="grid4">
+    ${PILLARS_L.map(p=>`<div class="tile" onclick="openModal('${p.t}','<p class=&quot;muted&quot;>${p.d}</p><div class=&quot;hr&quot;></div><p style=&quot;font-size:13px&quot;>${p.n} files · version-controlled · metadata: Market, Industry, Status, Owner, Expiry.</p>')"><div class="ti ${p.g}">${p.ico}</div><h3>${p.t}</h3><p>${p.d}</p><div class="hr"></div><div style="display:flex;justify-content:space-between;font-size:12px"><span class="muted" style="font-weight:700">${p.n} files</span><span class="link">Open →</span></div></div>`).join('')}
+  </div>
+  <div class="notice" style="margin-top:20px"><span class="ni">📚</span><div>Assets authored once at HQ, approved by Sales Ops, then reused by country teams — so nothing is rebuilt on someone's laptop. Feeds directly into the Proposal &amp; Demand generators.</div></div>`;
+
+/* boot */
+go('home');
+</script>
+</body>
+</html>

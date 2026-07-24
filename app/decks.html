@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sales Assets — HONO Sales OS</title>
+<style>
+:root{--ink:#0f1222;--ink2:#3a3f5c;--muted:#6b7192;--brand:#4f46e5;--brand2:#7c3aed;--teal:#0ea5a4;
+--line:#e7e8f0;--bg:#f5f6fb;--card:#fff;--soft:#f0f1f9;--shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);--r:14px}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.top{background:#12132b;color:#fff;padding:0 22px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10;height:56px}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:800;margin-right:6px}
+.nav{color:#c9cbe8;font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;text-decoration:none}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}.nav.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(14,165,164,.2);color:#8be0df;padding:5px 10px;border-radius:999px}
+.wrap{max-width:1100px;margin:0 auto;padding:22px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px}
+.ch{padding:13px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cb{padding:16px 18px}
+label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin:0 0 5px}
+input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;outline:none;background:#fff}
+.btn{height:40px;padding:0 16px;border:0;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.muted{color:var(--muted);font-size:12px}
+.uprow{display:grid;grid-template-columns:200px 1fr auto;gap:10px;align-items:end}
+.drop{border:1px dashed var(--line);border-radius:11px;background:var(--soft);padding:9px 12px;font-size:13px}
+.drop label{display:inline;color:var(--brand);font-weight:800;cursor:pointer;margin:0}
+.cat{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.cat h3{margin:0;padding:12px 15px;background:var(--soft);font-size:14px;display:flex;justify-content:space-between}
+.file{display:flex;align-items:center;gap:11px;padding:11px 15px;border-top:1px solid var(--line)}
+.ft{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex:none}
+.pptx{background:#c43e1c}.pdf{background:#e11d2f}.docx{background:#2b579a}.xlsx{background:#207245}.other{background:#64748b}
+.file a{margin-left:auto;font-size:12px;font-weight:700;color:var(--brand);text-decoration:none}
+.res{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25);border-radius:10px;padding:9px 13px;margin-top:12px;font-size:12.5px;font-weight:700}
+@media(max-width:760px){.uprow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="mark">H</div>
+  <a class="nav" href="/">Dashboard</a>
+  <a class="nav" href="/studio">Proposal Studio</a>
+  <a class="nav" href="/rfp">RFP Library</a>
+  <a class="nav on" href="/decks">Sales Assets</a>
+  <span class="badge-priv">🔒 Local only</span>
+</div>
+<div class="wrap">
+  <h1>Sales Assets</h1>
+  <div class="sub">One shelf for the whole team: corporate deck, solution decks, case studies, one-pagers, battlecards and price sheets — always the current version.</div>
+
+  <div class="card">
+    <div class="ch">Upload an asset</div>
+    <div class="cb">
+      <div class="uprow">
+        <div><label>Category</label><select id="cat"></select></div>
+        <div><label>File</label><div class="drop">📤 <label for="af">Choose file →</label><input id="af" type="file" style="display:none"><span id="afn" class="muted"></span></div></div>
+        <button class="btn" onclick="upload()">Upload</button>
+      </div>
+      <div id="upout"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">Library <span class="muted" id="adir"></span></div>
+    <div class="cb">
+      <input id="q" placeholder="🔎 Search assets…" oninput="render()" style="margin-bottom:14px">
+      <div id="lib"><p class="muted">Loading…</p></div>
+    </div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const CATS=["Corporate Decks","Solution Decks","Case Studies","One-Pagers","Battlecards","Pricing","Other"];
+let DATA=[];
+$('cat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
+$('af').onchange=e=>$('afn').textContent=e.target.files[0]?.name||'';
+function ftype(n){const e=n.split('.').pop().toLowerCase();return ['pptx','ppt'].includes(e)?'pptx':e==='pdf'?'pdf':['docx','doc'].includes(e)?'docx':['xlsx','xls','csv'].includes(e)?'xlsx':'other';}
+function ftlabel(n){return n.split('.').pop().slice(0,4).toUpperCase();}
+async function load(){try{const d=await (await fetch('/api/assets/list')).json();DATA=d.categories||[];$('adir').textContent=d.assets_dir||'';render();}catch(e){$('lib').innerHTML='<p class="muted">Could not load.</p>';}}
+function render(){
+  const q=($('q').value||'').toLowerCase().trim();
+  let cats=DATA.map(c=>{const files=q?c.files.filter(f=>f.name.toLowerCase().includes(q)):c.files;return {...c,files};}).filter(c=>c.files.length||(!q));
+  const shown=cats.filter(c=>c.files.length);
+  if(!shown.length){$('lib').innerHTML=`<p class="muted">${q?'No matches.':'No assets uploaded yet.'}</p>`;return;}
+  $('lib').innerHTML=shown.map(c=>`<div class="cat"><h3><span>${c.category}</span><span class="muted">${c.files.length} file${c.files.length>1?'s':''}</span></h3>
+    ${c.files.map(f=>`<div class="file"><div class="ft ${ftype(f.name)}">${ftlabel(f.name)}</div>
+      <div><div style="font-weight:700;font-size:13px">${f.name}</div><div class="muted">${f.size_kb} KB · ${f.modified}</div></div>
+      <a href="/api/download?base=assets&path=${encodeURIComponent(f.rel)}">Download</a></div>`).join('')}</div>`).join('');
+}
+async function upload(){
+  const f=$('af').files[0];if(!f){alert('Choose a file');return;}
+  const fd=new FormData();fd.append('file',f);fd.append('category',$('cat').value);
+  $('upout').innerHTML='<span class="muted">Uploading…</span>';
+  try{const d=await (await fetch('/api/assets/upload',{method:'POST',body:fd})).json();
+    $('upout').innerHTML=d.error?`<div class="res" style="background:rgba(220,38,38,.09);color:#b91c1c">✗ ${d.error}</div>`:`<div class="res">✓ Uploaded “${d.name}” to ${d.category}.</div>`;
+    $('af').value='';$('afn').textContent='';load();
+  }catch(e){$('upout').innerHTML='<div class="res" style="background:rgba(220,38,38,.09);color:#b91c1c">✗ '+e+'</div>';}
+}
+load();
+</script>
+</body>
+</html>

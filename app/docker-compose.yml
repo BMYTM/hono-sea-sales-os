@@ -1,0 +1,14 @@
+services:
+  hono-sales-os:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      # Team password (set a real one before sharing on the network)
+      HONO_USER: "team"
+      HONO_PASSWORD: "change-me"
+    volumes:
+      # Mount your shared proposal folder (OneDrive/SharePoint synced on the host)
+      # LEFT = path on the host machine, RIGHT = fixed path inside the container.
+      - "${HONO_HOST_PROPOSAL_DIR:-./Proposal Generation}:/data/Proposal Generation"
+    restart: unless-stopped

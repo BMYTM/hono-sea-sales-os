@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HONO Proposal Studio (private)</title>
+<style>
+:root{--ink:#0f1222;--ink2:#3a3f5c;--muted:#6b7192;--brand:#4f46e5;--brand2:#7c3aed;--teal:#0ea5a4;
+--line:#e7e8f0;--bg:#f5f6fb;--card:#fff;--soft:#f0f1f9;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;
+--shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);--r:14px}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.top{background:#12132b;color:#fff;padding:14px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:800}
+.top .t{font-weight:800}.top .s{font-size:11px;color:#8b8fc4}
+.pnav{color:#c9cbe8;font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;text-decoration:none}
+.pnav:hover{background:rgba(255,255,255,.08);color:#fff}.pnav.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(14,165,164,.2);color:#8be0df;padding:5px 10px;border-radius:999px}
+.wrap{max-width:1200px;margin:0 auto;padding:22px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{padding:9px 15px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink2)}
+.tab.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+.env{font-size:12px;padding:10px 14px;border-radius:10px;margin-bottom:16px;font-weight:600}
+.env.ok{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25)}
+.env.bad{background:rgba(220,38,38,.09);color:#b91c1c;border:1px solid rgba(220,38,38,.25)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px}
+.ch{padding:13px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cb{padding:16px 18px}
+label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin:0 0 5px}
+input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;outline:none;background:#fff}
+input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+.row{display:grid;gap:12px;margin-bottom:12px}.row.two{grid-template-columns:1fr 1fr}.row.three{grid-template-columns:1fr 1fr 1fr}.row.four{grid-template-columns:1fr 1fr 1fr 1fr}
+.cty{display:grid;grid-template-columns:1fr 90px 34px;gap:8px;margin-bottom:7px}
+.mini{height:34px;border:1px dashed var(--line);border-radius:9px;background:var(--soft);font-weight:700;color:var(--ink2);cursor:pointer;font-size:12.5px;width:100%}
+.x{border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-weight:800;color:var(--bad)}
+.chk{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600}
+.chk.on{border-color:var(--brand);background:var(--soft)}
+.btn{width:100%;height:44px;border:0;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sec{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+.vcard{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfcff}
+.vhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.vhead .vt{font-weight:800;font-size:14px;color:var(--brand)}
+.price{display:flex;justify-content:space-between;background:var(--soft);border-radius:10px;padding:10px 13px;margin:10px 0 0}
+.price .l{font-size:11px;color:var(--muted);font-weight:700}.price .v{font-size:16px;font-weight:800}
+.report{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#0f1122;color:#cdd0ee;padding:12px;border-radius:9px;max-height:240px;overflow:auto}
+.result{padding:12px 14px;border-radius:10px;margin-bottom:10px;font-size:12.5px;font-weight:600}
+.result.ok{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25)}
+.result.bad{background:rgba(220,38,38,.09);color:#b91c1c;border:1px solid rgba(220,38,38,.25)}
+.result.warn{background:rgba(217,119,6,.1);color:#b45309;border:1px solid rgba(217,119,6,.3)}
+.dl{display:inline-block;margin:8px 8px 0 0;background:#2b579a;color:#fff;padding:8px 13px;border-radius:9px;font-weight:700;font-size:12px;text-decoration:none}
+.dl.pdf{background:#e11d2f}
+.muted{color:var(--muted);font-size:12px}
+.client{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.client h4{margin:0;padding:12px 15px;background:var(--soft);font-size:13.5px;display:flex;justify-content:space-between}
+.file{display:flex;align-items:center;gap:10px;padding:10px 15px;border-top:1px solid var(--line)}
+.ft{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex:none}
+.docx{background:#2b579a}.pdf2{background:#e11d2f}
+.file a{margin-left:auto;font-size:12px;font-weight:700;color:var(--brand);text-decoration:none}
+.hide{display:none}
+.imp{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px dashed var(--line);border-radius:10px;padding:10px 13px;margin-bottom:14px;font-size:12.5px}
+.imp label{margin:0;cursor:pointer;color:var(--brand);font-weight:800}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="mark">H</div>
+  <a class="pnav" href="/">Dashboard</a>
+  <a class="pnav on" href="/studio">Proposal Studio</a>
+  <a class="pnav" href="/rfp">RFP Library</a>
+  <a class="pnav" href="/decks">Sales Assets</a>
+  <span class="badge-priv">🔒 Local only</span>
+</div>
+
+<div class="wrap">
+  <div id="envbar" class="env">Checking environment…</div>
+  <div class="tabs">
+    <div class="tab on" data-t="gen" onclick="tab('gen')">➕ New proposal</div>
+    <div class="tab" data-t="arch" onclick="tab('arch')">🗂️ Client archive</div>
+  </div>
+
+  <div id="gen">
+    <!-- CLIENT INFO -->
+    <div class="card">
+      <div class="ch">Client</div>
+      <div class="cb">
+        <div class="imp">
+          📥 <span>Have the client's module checklist?</span>
+          <label for="xlsx">Import .xlsx →</label>
+          <input id="xlsx" type="file" accept=".xlsx" style="display:none" onchange="importXlsx(this)">
+          <span id="impstatus" class="muted"></span>
+        </div>
+        <div class="row three">
+          <div><label>Client full name</label><input id="client_name" placeholder="Advance Intelligence Group"></div>
+          <div><label>Short name (folder/file)</label><input id="client_short" placeholder="AdvanceGroup"></div>
+          <div><label>Client code</label><input id="client_code" placeholder="ADV" maxlength="5"></div>
+        </div>
+        <div class="row four">
+          <div><label>Contact first name</label><input id="contact_name" placeholder="Keerthana"></div>
+          <div><label>Day</label><input id="day" type="number" value="17" min="1" max="31"></div>
+          <div><label>Month</label><select id="month">
+            <option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option selected>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
+          <div><label>Year</label><input id="year" type="number" value="2026"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERSIONS -->
+    <div class="card">
+      <div class="ch">Versions <span class="muted" style="font-weight:600">one .docx per version, all into the same client folder</span></div>
+      <div class="cb">
+        <div id="versions"></div>
+        <button class="mini" onclick="addVersion()">+ add another version (e.g. Non-AF, All-Entities)</button>
+      </div>
+    </div>
+
+    <button class="btn" id="genbtn" onclick="generate()">⚡ Generate all &amp; save to client folder</button>
+    <div id="out" style="margin-top:16px"></div>
+  </div>
+
+  <div id="arch" class="hide">
+    <div class="card">
+      <div class="ch">Client archive <span class="muted" id="archsub"></span></div>
+      <div class="cb">
+        <input id="archq" placeholder="🔎 Search client or file name…" oninput="renderArchive()" style="margin-bottom:14px">
+        <div id="archbody"><p class="muted">Loading…</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let SOFFICE = false;
+let versions = [];  // [{scope, pepm, currency, remove, payroll, defer, lms, countries:[{name,count}]}]
+
+function tab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  $('gen').classList.toggle('hide',t!=='gen');$('arch').classList.toggle('hide',t!=='arch');
+  if(t==='arch') loadArchive();}
+
+function newVersion(scope){return {scope:scope||'FullScope',pepm:8,currency:'USD',remove:'',payroll:'',defer:false,lms:true,countries:[{name:'Singapore',count:138},{name:'Indonesia',count:153}]};}
+function addVersion(scope){versions.push(newVersion(scope));renderVersions();}
+function delVersion(i){versions.splice(i,1);renderVersions();}
+function addCty(vi){versions[vi].countries.push({name:'',count:''});renderVersions();}
+function delCty(vi,ci){versions[vi].countries.splice(ci,1);renderVersions();}
+
+const CUR=['USD','SGD','MYR','PHP','IDR','INR','THB','VND'];
+function money(cur,n){return cur+' '+n.toLocaleString('en-US');}
+
+function renderVersions(){
+  $('versions').innerHTML = versions.map((v,i)=>{
+    const total=v.countries.reduce((a,c)=>a+(parseInt(c.count)||0),0);
+    const annual=total*(parseFloat(v.pepm)||0)*12, impl=Math.round(annual*0.75);
+    return `<div class="vcard">
+      <div class="vhead"><div class="vt">Version ${i+1}</div>${versions.length>1?`<button class="x" style="width:auto;padding:4px 10px" onclick="delVersion(${i})">Remove</button>`:''}</div>
+      <div class="row three">
+        <div><label>Scope label</label><input value="${v.scope}" oninput="versions[${i}].scope=this.value"></div>
+        <div><label>PEPM</label><input type="number" value="${v.pepm}" oninput="versions[${i}].pepm=this.value;renderPrice(${i})"></div>
+        <div><label>Currency</label><select onchange="versions[${i}].currency=this.value;renderPrice(${i})">${CUR.map(c=>`<option ${c===v.currency?'selected':''}>${c}</option>`).join('')}</select></div>
+      </div>
+      <label>Countries &amp; headcount</label>
+      ${v.countries.map((c,ci)=>`<div class="cty">
+        <input placeholder="Country" value="${c.name}" oninput="versions[${i}].countries[${ci}].name=this.value">
+        <input type="number" placeholder="Headcount" value="${c.count}" oninput="versions[${i}].countries[${ci}].count=this.value;renderPrice(${i})">
+        <button class="x" onclick="delCty(${i},${ci})">×</button></div>`).join('')}
+      <button class="mini" onclick="addCty(${i})">+ add country</button>
+      <div class="row two" style="margin-top:12px">
+        <div class="chk ${v.defer?'on':''}" onclick="versions[${i}].defer=!versions[${i}].defer;renderVersions()"><input type="checkbox" ${v.defer?'checked':''}> Defer Attendance &amp; Overtime</div>
+        <div class="chk ${v.lms?'on':''}" onclick="versions[${i}].lms=!versions[${i}].lms;renderVersions()"><input type="checkbox" ${v.lms?'checked':''}> LMS as Phase 2</div>
+      </div>
+      <div class="row two" style="margin-top:4px">
+        <div><label>Remove modules (comma-sep)</label><input value="${v.remove}" placeholder="Succession Management" oninput="versions[${i}].remove=this.value"></div>
+        <div><label>Payroll-excluded countries</label><input value="${v.payroll}" placeholder="Hong Kong, China" oninput="versions[${i}].payroll=this.value"></div>
+      </div>
+      <div class="price" id="price${i}">
+        <div><div class="l">Total headcount</div><div class="v">${total.toLocaleString()}</div></div>
+        <div><div class="l">Annual fee</div><div class="v">${total?money(v.currency,annual):'—'}</div></div>
+        <div><div class="l">Implementation (75%)</div><div class="v">${total?money(v.currency,impl):'—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderPrice(i){
+  const v=versions[i];const total=v.countries.reduce((a,c)=>a+(parseInt(c.count)||0),0);
+  const annual=total*(parseFloat(v.pepm)||0)*12, impl=Math.round(annual*0.75);
+  $('price'+i).innerHTML=`<div><div class="l">Total headcount</div><div class="v">${total.toLocaleString()}</div></div>
+    <div><div class="l">Annual fee</div><div class="v">${total?money(v.currency,annual):'—'}</div></div>
+    <div><div class="l">Implementation (75%)</div><div class="v">${total?money(v.currency,impl):'—'}</div></div>`;
+}
+
+async function importXlsx(inp){
+  if(!inp.files.length)return;
+  $('impstatus').textContent='Reading…';
+  const fd=new FormData();fd.append('file',inp.files[0]);
+  try{
+    const r=await fetch('/api/parse-checklist',{method:'POST',body:fd});const d=await r.json();
+    if(d.error){$('impstatus').textContent='⚠ '+d.error;return;}
+    // prefill version 1
+    if(!versions.length)addVersion();
+    if(d.countries&&d.countries.length)versions[0].countries=d.countries.map(c=>({name:c.name,count:c.count}));
+    if(d.remove&&d.remove.length)versions[0].remove=d.remove.join(', ');
+    versions[0].defer=!!d.defer_attendance;
+    renderVersions();
+    const decided=(d.modules||[]).filter(m=>m.decision!=='include').map(m=>`${m.module}: ${m.decision}`);
+    $('impstatus').textContent=`✓ ${d.countries.length} countries, ${d.modules?d.modules.length:0} modules imported${decided.length?' · '+decided.join(' · '):''}`;
+  }catch(err){$('impstatus').textContent='⚠ '+err;}
+}
+
+async function env(){
+  try{const r=await fetch('/api/env');const e=await r.json();SOFFICE=e.soffice_available;
+    if(e.template_exists&&e.project_exists){$('envbar').className='env ok';
+      $('envbar').innerHTML=`✓ Template found · archive at <b>${e.project_dir}</b>${e.soffice_available?' · PDF preview ON':' · (install LibreOffice for PDF preview)'}`;
+    }else{$('envbar').className='env bad';
+      $('envbar').innerHTML=`⚠ ${!e.template_exists?'Base template NOT found at '+e.template+'. ':''}${!e.project_exists?'Project folder missing at '+e.project_dir+'. ':''}Set HONO_TEMPLATE / HONO_PROJECT_DIR and restart.`;}
+  }catch(err){$('envbar').className='env bad';$('envbar').textContent='Backend not reachable.';}
+}
+
+async function generate(){
+  const client={client_name:$('client_name').value.trim(),client_short:$('client_short').value.trim(),
+    client_code:$('client_code').value.trim(),contact_name:$('contact_name').value.trim(),
+    date:{day:$('day').value,month:$('month').value,year:$('year').value}};
+  if(!client.client_name||!client.client_short||!client.client_code){alert('Client name, short name and code are required.');return;}
+  const vs=versions.map(v=>({scope:v.scope.trim()||'FullScope',pepm:v.pepm,currency:v.currency,
+    countries:v.countries.filter(c=>c.name&&c.count),
+    remove:v.remove.split(',').map(s=>s.trim()).filter(Boolean),
+    payroll_exclude:v.payroll.split(',').map(s=>s.trim()).filter(Boolean),
+    defer_attendance:v.defer,phase2_lms:v.lms}));
+  if(vs.some(v=>!v.countries.length)){alert('Every version needs at least one country with a headcount.');return;}
+  const btn=$('genbtn');btn.disabled=true;btn.textContent='Generating…';
+  $('out').innerHTML='<p class="muted">Patching template(s), checking mandatory clause, saving…</p>';
+  try{
+    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client,versions:vs})});
+    const d=await r.json();
+    $('out').innerHTML='<div class="card"><div class="ch">Results</div><div class="cb">'+d.results.map(res=>{
+      if(!res.ok)return `<div class="result bad">✗ ${res.scope}: ${(res.error||'failed').replace(/</g,'&lt;')}</div>${res.report?`<div class="report">${res.report.replace(/</g,'&lt;')}</div>`:''}`;
+      const s=res.summary;
+      const warn=res.clean?'':`<div class="result warn">⚠ Saved, but some fields need a manual check — see ERRORS in the report.</div>`;
+      const pdfDl=res.pdf_rel?`<a class="dl pdf" href="/api/download?path=${encodeURIComponent(res.pdf_rel)}">⬇ Download PDF</a>`:'';
+      const pdfPrev=SOFFICE?`<a class="dl" style="background:#0ea5a4" target="_blank" href="/api/preview?path=${encodeURIComponent(res.rel)}">👁 Preview</a>`:'';
+      const pdfNote=res.pdf_rel?'<span class="muted"> · PDF saved alongside</span>':'';
+      return `<div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)">
+        <div class="result ok">✓ <b>${res.scope}</b> — saved ${res.file}${res.headless_ok?' · ✓ Headless API clause':''}${pdfNote}</div>${warn}
+        <div class="price"><div><div class="l">Proposal ID</div><div class="v" style="font-size:13px">${s.proposal_id}</div></div>
+        <div><div class="l">Annual</div><div class="v">${money(s.currency,s.annual)}</div></div>
+        <div><div class="l">Impl</div><div class="v">${money(s.currency,s.impl)}</div></div></div>
+        <a class="dl" href="/api/download?path=${encodeURIComponent(res.rel)}">⬇ Download .docx</a>${pdfDl}${pdfPrev}
+        <details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Patch report</summary><div class="report">${(res.report||'').replace(/</g,'&lt;')}</div></details>
+      </div>`;
+    }).join('')+'</div></div>';
+  }catch(err){$('out').innerHTML='<div class="result bad">✗ '+err+'</div>';}
+  btn.disabled=false;btn.textContent='⚡ Generate all & save to client folder';
+}
+
+let ARCHIVE=[];
+async function loadArchive(){
+  $('archbody').innerHTML='<p class="muted">Loading…</p>';
+  try{const r=await fetch('/api/proposals');const d=await r.json();
+    $('archsub').textContent=d.project_dir||'';
+    if(d.error){ARCHIVE=[];$('archbody').innerHTML=`<p class="muted">${d.error}</p>`;return;}
+    ARCHIVE=d.clients||[];renderArchive();
+  }catch(err){$('archbody').innerHTML='<p class="muted">Could not load archive: '+err+'</p>';}
+}
+function renderArchive(){
+  const q=($('archq').value||'').toLowerCase().trim();
+  let clients=ARCHIVE;
+  if(q){clients=ARCHIVE.map(c=>{
+    if(c.client.toLowerCase().includes(q))return c;
+    const files=c.files.filter(f=>f.name.toLowerCase().includes(q));
+    return files.length?{...c,files,count:files.length}:null;
+  }).filter(Boolean);}
+  if(!ARCHIVE.length){$('archbody').innerHTML='<p class="muted">No client folders with proposals yet.</p>';return;}
+  if(!clients.length){$('archbody').innerHTML='<p class="muted">No matches for “'+q+'”.</p>';return;}
+  $('archbody').innerHTML=clients.map(c=>`<div class="client"><h4><span>${c.client}</span><span class="muted">${c.count} file${c.count>1?'s':''}</span></h4>
+    ${c.files.map(f=>{const isPdf=f.name.toLowerCase().endsWith('.pdf');
+      return `<div class="file"><div class="ft ${isPdf?'pdf2':'docx'}">${isPdf?'PDF':'DOCX'}</div>
+      <div><div style="font-weight:700;font-size:12.5px">${f.name}</div><div class="muted">${f.size_kb} KB · ${f.modified}</div></div>
+      <a href="/api/download?path=${encodeURIComponent(f.rel)}">Download</a></div>`;}).join('')}</div>`).join('');
+}
+
+// boot
+addVersion('FullScope');env();
+</script>
+</body>
+</html>

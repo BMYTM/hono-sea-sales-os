@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RFP Library — HONO Sales OS</title>
+<style>
+:root{--ink:#0f1222;--ink2:#3a3f5c;--muted:#6b7192;--brand:#4f46e5;--brand2:#7c3aed;--teal:#0ea5a4;
+--line:#e7e8f0;--bg:#f5f6fb;--card:#fff;--soft:#f0f1f9;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;
+--shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);--r:14px}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.top{background:#12132b;color:#fff;padding:0 22px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10;height:56px}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:800;margin-right:6px}
+.nav{color:#c9cbe8;font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;text-decoration:none}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}.nav.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(14,165,164,.2);color:#8be0df;padding:5px 10px;border-radius:999px}
+.wrap{max-width:1100px;margin:0 auto;padding:22px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px}
+.ch{padding:13px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cb{padding:16px 18px}
+.stat{display:flex;gap:14px;flex-wrap:wrap}
+.kpi{flex:1;min-width:130px;background:var(--soft);border-radius:11px;padding:12px 14px}
+.kpi .l{font-size:11px;color:var(--muted);font-weight:700}.kpi .v{font-size:22px;font-weight:800}
+label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin:0 0 5px}
+input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;outline:none;background:#fff}
+.btn{height:40px;padding:0 16px;border:0;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.btn:disabled{opacity:.5}
+.muted{color:var(--muted);font-size:12px}
+.drop{border:1px dashed var(--line);border-radius:11px;background:var(--soft);padding:14px;text-align:center;font-size:13px}
+.drop label{display:inline;color:var(--brand);font-weight:800;cursor:pointer;margin:0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.pill{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px}
+.p-fill{background:rgba(22,163,74,.13);color:#15803d}.p-rev{background:rgba(217,119,6,.14);color:#b45309}
+.conf{font-weight:800}
+.file{display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--line)}
+.ft{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex:none;background:#207245}
+.file a{margin-left:auto;font-size:12px;font-weight:700;color:var(--brand);text-decoration:none}
+.row2{display:grid;grid-template-columns:1fr 160px auto;gap:10px;align-items:end}
+.res{background:rgba(79,70,229,.06);border:1px solid rgba(79,70,229,.2);border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:13px;font-weight:600}
+@media(max-width:760px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="mark">H</div>
+  <a class="nav" href="index.html">Dashboard</a>
+  <a class="nav" href="studio.html">Proposal Studio</a>
+  <a class="nav on" href="rfp.html">RFP Library</a>
+  <a class="nav" href="decks.html">Sales Assets</a>
+  <span class="badge-priv">🔒 Local only</span>
+</div>
+<div class="wrap">
+  <h1>RFP Library</h1>
+  <div class="sub">Store old &amp; new RFPs, and auto-fill a new RFP from your past answers — with a confidence score and the source for every suggestion.</div>
+
+  <div class="card"><div class="cb"><div class="stat">
+    <div class="kpi"><div class="l">Answers in bank</div><div class="v" id="k_bank">–</div></div>
+    <div class="kpi"><div class="l">Old RFPs stored</div><div class="v" id="k_old">–</div></div>
+    <div class="kpi"><div class="l">New RFPs stored</div><div class="v" id="k_new">–</div></div>
+  </div><div class="muted" id="rfpdir" style="margin-top:10px"></div></div></div>
+
+  <div class="card">
+    <div class="ch">1 · Build the answer bank <span class="muted">import a past RFP (xlsx: Question + Answer columns)</span></div>
+    <div class="cb">
+      <div class="row2">
+        <div class="drop">📥 <label for="bankfile">Choose old RFP .xlsx →</label>
+          <input id="bankfile" type="file" accept=".xlsx" style="display:none">
+          <span id="bankname" class="muted"></span></div>
+        <div><label>Tag (optional)</label><input id="banktag" placeholder="e.g. Banking, Payroll"></div>
+        <button class="btn" onclick="importBank()">Import to bank</button>
+      </div>
+      <div id="bankout" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">2 · Auto-fill a new RFP <span class="muted">upload the new RFP questions (xlsx/csv)</span></div>
+    <div class="cb">
+      <div class="row2">
+        <div class="drop">📄 <label for="newfile">Choose new RFP .xlsx/.csv →</label>
+          <input id="newfile" type="file" accept=".xlsx,.csv" style="display:none">
+          <span id="newname" class="muted"></span></div>
+        <div><label>Match threshold</label><select id="thr"><option value="0.25">Loose (0.25)</option><option value="0.35" selected>Balanced (0.35)</option><option value="0.5">Strict (0.5)</option></select></div>
+        <button class="btn" onclick="autofill()">⚡ Auto-fill</button>
+      </div>
+      <div id="fillout" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">RFP files</div>
+    <div class="cb" id="files"><p class="muted">Loading…</p></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const DEMO = !['localhost','127.0.0.1'].includes(location.hostname);
+function demoNote(){alert("Public preview.\n\nLive generation, upload and RFP auto-fill run only in the private HONO Sales OS app (download the /app folder from the repo and run ./run.sh). Your real client data never touches this public site.");}
+if(DEMO){window.addEventListener('DOMContentLoaded',()=>{const b=document.createElement('div');b.style.cssText='background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:10px 16px;font:600 12.5px system-ui;text-align:center';b.innerHTML='🌐 Public preview — the dashboard is fully interactive. Live proposal/RFP/asset actions run in the private local app (see the repo /app folder). No client data is stored here.';document.body.insertBefore(b,document.body.firstChild);});}
+
+$('bankfile').onchange=e=>$('bankname').textContent=e.target.files[0]?.name||'';
+$('newfile').onchange=e=>$('newname').textContent=e.target.files[0]?.name||'';
+
+async function summary(){
+  try{const d=await (await fetch('/api/rfp/summary')).json();
+    $('k_bank').textContent=d.bank_count;$('k_old').textContent=d.old_count;$('k_new').textContent=d.new_count;
+    $('rfpdir').textContent='Stored in: '+d.rfp_dir;}catch(e){}
+}
+async function loadFiles(){
+  try{const d=await (await fetch('/api/rfp/list')).json();
+    const sec=(t,arr)=>`<div style="font-weight:800;font-size:12.5px;margin:8px 0 2px">${t}</div>`+(arr.length?arr.map(f=>`<div class="file"><div class="ft">${f.name.split('.').pop().slice(0,3).toUpperCase()}</div><div><div style="font-weight:700;font-size:12.5px">${f.name}</div><div class="muted">${f.size_kb} KB · ${f.modified}</div></div><a href="/api/download?base=rfp&path=${encodeURIComponent(f.rel)}">Download</a></div>`).join(''):'<div class="muted" style="padding:6px 0">None yet.</div>');
+    $('files').innerHTML=sec('Old RFPs',d.old)+sec('New / auto-filled',d.new);
+  }catch(e){$('files').innerHTML='<p class="muted">Could not load.</p>';}
+}
+async function importBank(){ if(DEMO)return demoNote();
+  const f=$('bankfile').files[0];if(!f){alert('Choose an old RFP .xlsx');return;}
+  const fd=new FormData();fd.append('file',f);fd.append('tag',$('banktag').value);
+  $('bankout').innerHTML='<span class="muted">Importing…</span>';
+  try{const d=await (await fetch('/api/rfp/import-bank',{method:'POST',body:fd})).json();
+    $('bankout').innerHTML=d.error?`<div class="res" style="color:#b91c1c">✗ ${d.error}</div>`:`<div class="res">✓ Added ${d.added} answers · bank now holds ${d.bank_count}.</div>`;
+    summary();loadFiles();
+  }catch(e){$('bankout').innerHTML='<div class="res">✗ '+e+'</div>';}
+}
+async function autofill(){ if(DEMO)return demoNote();
+  const f=$('newfile').files[0];if(!f){alert('Choose a new RFP file');return;}
+  const fd=new FormData();fd.append('file',f);fd.append('threshold',$('thr').value);
+  $('fillout').innerHTML='<span class="muted">Matching against your answer bank…</span>';
+  try{const d=await (await fetch('/api/rfp/autofill',{method:'POST',body:fd})).json();
+    if(d.error){$('fillout').innerHTML=`<div class="res" style="color:#b91c1c">✗ ${d.error}</div>`;return;}
+    const rows=d.rows.map(r=>`<tr><td>${esc(r.question)}</td><td>${esc(r.answer)||'<span class=muted>—</span>'}</td>
+      <td class="conf" style="color:${r.confidence>=0.5?'#15803d':r.confidence>=0.35?'#b45309':'#b91c1c'}">${(r.confidence*100).toFixed(0)}%</td>
+      <td class="muted">${esc(r.source)}</td><td><span class="pill ${r.status==='filled'?'p-fill':'p-rev'}">${r.status}</span></td></tr>`).join('');
+    $('fillout').innerHTML=`<div class="res">✓ ${d.total} questions · <b>${d.filled}</b> auto-filled · <b>${d.review}</b> need review
+      &nbsp; <a class="btn" style="text-decoration:none;line-height:40px;display:inline-block;padding:0 14px" href="/api/download?base=rfp&path=${encodeURIComponent(d.rel)}">⬇ Download filled xlsx</a></div>
+      <div style="overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:10px">
+      <table><thead><tr><th>Question</th><th>Suggested answer</th><th>Conf.</th><th>Source</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    summary();loadFiles();
+  }catch(e){$('fillout').innerHTML='<div class="res">✗ '+e+'</div>';}
+}
+function esc(s){return (s==null?'':String(s)).replace(/</g,'&lt;');}
+summary();loadFiles();
+</script>
+</body>
+</html>

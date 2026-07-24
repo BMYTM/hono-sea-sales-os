@@ -330,12 +330,12 @@ VIEWS.home = () => {
   </div>
   <div class="card-h" style="border:0;padding:0 2px 12px"><h3 style="font-size:17px">Jump into a module</h3></div>
   <div class="tiles">
-    <div class="tile" onclick="go('proposal')"><div class="ti g-p">📄</div><h3>Proposal Generator</h3><p>Configure modules, headcount and term → instant, on-brand proposal with live pricing.</p></div>
+    <div class="tile" onclick="location.href='studio.html'"><div class="ti g-p">📄</div><h3>Proposal Studio →</h3><p>Generate the real branded .docx (multi-version, PDF) into the client folder from your HONO template.</p></div>
+    <div class="tile" onclick="location.href='rfp.html'"><div class="ti g-l">📋</div><h3>RFP Library →</h3><p>Store old &amp; new RFPs and auto-fill a new RFP from your past answers with confidence scores.</p></div>
+    <div class="tile" onclick="location.href='decks.html'"><div class="ti g-b">🗂️</div><h3>Sales Assets →</h3><p>Corporate deck, solution decks, case studies, one-pagers, battlecards and price sheets.</p></div>
     <div class="tile" onclick="go('demand')"><div class="ti g-d">🎯</div><h3>Demand Generator</h3><p>Build a campaign and project the funnel from target accounts to booked pipeline.</p></div>
-    <div class="tile" onclick="go('pipeline')"><div class="ti g-l">🔀</div><h3>Pipeline (SEA)</h3><p>Read-only mirror of the SEA dashboard — stages, weighted forecast and deals.</p></div>
     <div class="tile" onclick="go('account')"><div class="ti g-r">🎖️</div><h3>Account Strategy &amp; Closure</h3><p>MEDDICC health, stakeholder map and a mutual close plan for every key deal.</p></div>
     <div class="tile" onclick="go('ceo')"><div class="ti g-c">📈</div><h3>CEO Review Dashboard</h3><p>Executive rollup: market quota attainment, forecast, top deals and risks.</p></div>
-    <div class="tile" onclick="go('library')"><div class="ti g-b">📚</div><h3>Content Library</h3><p>Proposals, decks, playbooks and client records — governed and searchable.</p></div>
   </div>
   <div class="notice" style="margin-top:20px"><span class="ni">🔒</span><div>The <b>Pipeline</b> and <b>CEO Dashboard</b> read from the existing SEA Dashboard as the source of record. This system displays and works on top of that data — it never overwrites it.</div></div>`;
 };
@@ -343,7 +343,12 @@ VIEWS.home = () => {
 /* ============================================================= PROPOSAL GENERATOR */
 let PST = {client:'', mkt:'Indonesia', ind:'Retail', emp:2000, mods:{core:true,payroll:true,attend:true,leave:true,perf:false,recruit:false,ess:true}, tier:'Professional', term:'2 years'};
 VIEWS.proposal = () => `
-  <div class="vhead"><h1>Proposal Generator</h1><p>Fill the deal parameters and generate a ready-to-send proposal with computed commercials. Pricing uses placeholder HONO per-employee-per-month rates — swap for your live price book.</p></div>
+  <div class="vhead"><h1>Proposal Generator</h1><p>Quick estimate below — or open the <b>live Proposal Studio</b> to generate the real branded .docx into the client folder from your HONO template.</p></div>
+  <div class="notice" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:0;margin-bottom:18px">
+    <span class="ni">⚡</span>
+    <div style="flex:1">Ready to produce a client-ready proposal? The <b>Proposal Studio</b> patches your real HONO template, runs the mandatory-clause check, and saves it into the client folder.</div>
+    <a href="studio.html" style="background:#fff;color:#4f46e5;font-weight:800;padding:9px 16px;border-radius:10px;text-decoration:none;white-space:nowrap">Open Proposal Studio →</a>
+  </div>
   <div class="grid2">
     <div class="card">
       <div class="card-h"><h3>Deal parameters</h3></div>

@@ -187,9 +187,11 @@ async function generate(){
       const dd=String(d.day).padStart(2,'0'),mm=String(HONO_month(d.month)).padStart(2,'0');
       const fname=`HONO_HCM Proposal_${dd}${mm}${d.year}_${short}_${cfg.scope}.docx`;
       HONO.dl(fname,r.blob);
+      let filed=false;
+      try{await HONO.FILES.upload(new File([r.blob],fname,{type:r.blob.type||'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}),'Proposals');filed=true;}catch(e){}
       const p=r.pricing;const warn=r.clean?'':'<div class="result warn">⚠ Downloaded, but check the review notes in the report.</div>';
       blocks.push(`<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)">
-        <div class="result ok">✓ <b>${esc(cfg.scope)}</b> — downloaded ${esc(fname)}</div>${warn}
+        <div class="result ok">✓ <b>${esc(cfg.scope)}</b> — downloaded${filed?' &amp; filed to <a href="files.html?folder=Proposals" style="color:#15803d;font-weight:800">Files › Proposals</a>':''} · ${esc(fname)}</div>${warn}
         <div class="price"><div><div class="l">Proposal ID</div><div class="v" style="font-size:13px">${p.id}</div></div>
         <div><div class="l">Annual</div><div class="v">${money(p.cur,p.annual)}</div></div>
         <div><div class="l">Impl</div><div class="v">${money(p.cur,p.impl)}</div></div></div>

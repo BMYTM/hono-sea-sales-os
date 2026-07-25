@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Files — HONO Sales Toolkit</title>
+<script src="hono-portal.js"></script>
+<style>
+:root{--ink:#0f1222;--ink2:#3a3f5c;--muted:#6b7192;--brand:#4f46e5;--brand2:#7c3aed;--teal:#0ea5a4;
+--line:#e7e8f0;--bg:#f5f6fb;--card:#fff;--soft:#f0f1f9;--ok:#16a34a;--bad:#dc2626;--shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);--r:14px}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.top{background:#12132b;color:#fff;padding:0 22px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10;height:56px}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:800;margin-right:6px}
+.nav{color:#c9cbe8;font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;text-decoration:none}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}.nav.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(14,165,164,.2);color:#8be0df;padding:5px 10px;border-radius:999px}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
+.side{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px;position:sticky;top:74px}
+.side h3{margin:4px 8px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.folder{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink2)}
+.folder:hover{background:var(--soft)}.folder.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.folder .cnt{margin-left:auto;font-size:11px;font-weight:700;opacity:.8}
+.folder .fx{opacity:0;color:var(--bad);font-weight:800;cursor:pointer;border:0;background:none}
+.folder:hover .fx{opacity:.7}.folder.on .fx{color:#fff}
+.newf{display:flex;gap:6px;margin-top:8px}
+.newf input{flex:1;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.5px;outline:none}
+.newf button{border:0;background:var(--brand);color:#fff;border-radius:8px;font-weight:800;padding:0 11px;cursor:pointer}
+.main{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.mh{padding:16px 18px;border-bottom:1px solid var(--line)}
+.mh h1{margin:0;font-size:19px}
+.mh .row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.search{flex:1;min-width:180px;position:relative}
+.search input{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 12px 0 34px;font-size:13.5px;outline:none}
+.search svg{position:absolute;left:11px;top:11px;color:var(--muted)}
+.btn{height:38px;padding:0 15px;border:0;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));display:inline-flex;align-items:center;gap:7px}
+.drop{margin:16px 18px 0;border:2px dashed var(--line);border-radius:12px;background:var(--soft);padding:22px;text-align:center;color:var(--muted);font-size:13px;transition:border .15s,background .15s}
+.drop.hot{border-color:var(--brand);background:#eef0ff;color:var(--brand)}
+.drop b{color:var(--brand)}
+.flist{padding:8px 6px 12px}
+.frow{display:grid;grid-template-columns:38px 1fr 92px 130px auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px}
+.frow:hover{background:var(--soft)}
+.ficon{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff}
+.pptx{background:#c43e1c}.pdf{background:#e11d2f}.docx,.doc{background:#2b579a}.xlsx,.xls,.csv{background:#207245}.png,.jpg,.jpeg,.gif,.svg{background:#7c3aed}.zip{background:#6b7280}.other{background:#64748b}
+.fname{font-weight:700;font-size:13.5px;cursor:pointer}.fname:hover{color:var(--brand)}
+.fmeta{font-size:11px;color:var(--muted)}
+.acts{display:flex;gap:6px;align-items:center}
+.acts button,.acts select{border:1px solid var(--line);background:#fff;border-radius:8px;font-size:11.5px;font-weight:700;padding:5px 8px;cursor:pointer;color:var(--ink2)}
+.acts .del{color:var(--bad)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.usage{font-size:11px;color:var(--muted);margin-top:10px;padding:0 4px}
+.bar{height:6px;border-radius:999px;background:var(--soft);overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--brand))}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}.frow{grid-template-columns:34px 1fr auto}.frow .fsize,.frow .fdate{display:none}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="mark">H</div>
+  <a class="nav" href="index.html">Home</a>
+  <a class="nav" href="studio.html">Proposal Studio</a>
+  <a class="nav on" href="files.html">Files</a>
+  <a class="nav" href="rfp.html">RFP Library</a>
+  <span class="badge-priv">🔒 Private · in your browser</span>
+</div>
+<div class="wrap">
+  <div class="layout">
+    <aside class="side">
+      <h3>Folders</h3>
+      <div id="folderList"></div>
+      <div class="newf"><input id="newfolder" placeholder="New folder…" onkeydown="if(event.key==='Enter')mkFolder()"><button onclick="mkFolder()">+</button></div>
+      <div class="usage" id="usage"></div>
+    </aside>
+    <section class="main">
+      <div class="mh">
+        <h1 id="title">All files</h1>
+        <div class="row">
+          <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="q" placeholder="Search all files…" oninput="render()"></div>
+          <label class="btn" style="cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg> Upload files
+            <input id="fileinput" type="file" multiple style="display:none" onchange="pickUpload(this)"></label>
+        </div>
+      </div>
+      <div class="drop" id="drop">Drag &amp; drop files here to add them to <b id="dropfolder">this folder</b></div>
+      <div class="flist" id="flist"></div>
+    </section>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const F=HONO.FILES;
+let CUR='__all__';
+function esc(s){return (s==null?'':String(s)).replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function fmtSize(b){return b>=1048576?(b/1048576).toFixed(1)+' MB':b>=1024?Math.round(b/1024)+' KB':b+' B';}
+function iconClass(ext){return ['pptx','ppt'].includes(ext)?'pptx':ext==='pdf'?'pdf':['docx','doc'].includes(ext)?'docx':['xlsx','xls','csv'].includes(ext)?'xlsx':['png','jpg','jpeg','gif','svg'].includes(ext)?'png':ext==='zip'?'zip':'other';}
+
+function renderFolders(){
+  const folders=F.folders();const meta=F.meta();
+  const count=f=>meta.filter(x=>x.folder===f).length;
+  let html=`<div class="folder ${CUR==='__all__'?'on':''}" onclick="openFolder('__all__')">🗂️ All files <span class="cnt">${meta.length}</span></div>`;
+  html+=folders.map(f=>`<div class="folder ${CUR===f?'on':''}" onclick="openFolder('${esc(f)}')">📁 ${esc(f)} <span class="cnt">${count(f)}</span><button class="fx" title="Delete folder" onclick="event.stopPropagation();delFolder('${esc(f)}')">×</button></div>`).join('');
+  $('folderList').innerHTML=html;
+}
+function openFolder(f){CUR=f;$('q').value='';render();}
+function mkFolder(){const v=$('newfolder').value.trim();if(!v)return;F.addFolder(v);$('newfolder').value='';renderFolders();}
+function delFolder(f){if(confirm(`Delete folder “${f}”? Files inside move to “Other”.`)){F.removeFolder(f);if(CUR===f)CUR='__all__';renderFolders();render();}}
+
+function render(){
+  renderFolders();
+  const q=($('q').value||'').toLowerCase().trim();
+  $('title').textContent=CUR==='__all__'?'All files':CUR;
+  $('dropfolder').textContent=CUR==='__all__'?'Other':CUR;
+  let meta=F.meta().slice().reverse();
+  if(CUR!=='__all__'&&!q)meta=meta.filter(x=>x.folder===CUR);
+  if(q)meta=meta.filter(x=>x.name.toLowerCase().includes(q)||x.folder.toLowerCase().includes(q));
+  if(!meta.length){$('flist').innerHTML=`<div class="empty">${q?'No files match your search.':'No files here yet — drag files in or use <b>Upload files</b>.'}</div>`;usage();return;}
+  const folders=F.folders();
+  $('flist').innerHTML=meta.map(it=>`<div class="frow">
+    <div class="ficon ${iconClass(it.ext)}">${(it.ext||'?').toUpperCase().slice(0,4)}</div>
+    <div><div class="fname" onclick="HONO.FILES.open('${it.id}')" title="Open">${esc(it.name)}</div><div class="fmeta">${esc(it.folder)} · ${it.added}</div></div>
+    <div class="fsize fmeta">${fmtSize(it.size)}</div>
+    <div class="fdate">
+      <select onchange="F.move('${it.id}',this.value);render()" title="Move to folder">${folders.map(f=>`<option ${f===it.folder?'selected':''}>${esc(f)}</option>`).join('')}</select>
+    </div>
+    <div class="acts">
+      <button onclick="HONO.FILES.download('${it.id}')">⬇</button>
+      <button onclick="renameFile('${it.id}')">✎</button>
+      <button class="del" onclick="rmFile('${it.id}')">🗑</button>
+    </div></div>`).join('');
+  usage();
+}
+function renameFile(id){const it=F.meta().find(x=>x.id===id);const n=prompt('Rename file',it?it.name:'');if(n){F.rename(id,n.trim());render();}}
+function rmFile(id){if(confirm('Delete this file?')){F.remove(id).then(render);}}
+
+async function pickUpload(inp){await uploadList(inp.files);inp.value='';}
+async function uploadList(files){
+  const folder=CUR==='__all__'?'Other':CUR;
+  for(const f of files){try{await F.upload(f,folder);}catch(e){alert('Could not store '+f.name+': '+(e.message||e));}}
+  render();
+}
+async function usage(){const u=await F.usage();if(u&&u.quota){const pct=Math.min(100,Math.round(u.used/u.quota*100));$('usage').innerHTML=`Storage used: ${fmtSize(u.used)} of ${fmtSize(u.quota)}<div class="bar"><i style="width:${pct}%"></i></div>`;}}
+
+// drag & drop
+const drop=$('drop');
+['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot');}));
+drop.addEventListener('drop',ev=>{if(ev.dataTransfer.files.length)uploadList(ev.dataTransfer.files);});
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>e.preventDefault());
+
+// deep link ?folder= / ?q=
+const params=new URLSearchParams(location.search);
+if(params.get('folder'))CUR=params.get('folder');
+render();
+if(params.get('q')){$('q').value=params.get('q');render();}
+</script>
+</body>
+</html>

@@ -227,5 +227,46 @@
     async get(k) { const db = await this.open(); if (!db) return null; return new Promise(r => { const t = db.transaction("kv", "readonly"); const q = t.objectStore("kv").get(k); q.onsuccess = () => r(q.result || null); q.onerror = () => r(null); }); },
   };
 
-  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, readSheetRows, writeXlsx, tokens, cosine };
+  // ---------- File storage (folders + real file bytes in IndexedDB) ----------
+  const FDB = {
+    db: null,
+    open() {
+      return new Promise((res) => {
+        if (this.db) return res(this.db);
+        const r = indexedDB.open("hono_files", 1);
+        r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains("blobs")) db.createObjectStore("blobs"); };
+        r.onsuccess = () => { this.db = r.result; res(this.db); };
+        r.onerror = () => res(null);
+      });
+    },
+    async put(id, blob) { const db = await this.open(); if (!db) throw new Error("Storage unavailable"); return new Promise((res, rej) => { const t = db.transaction("blobs", "readwrite"); t.objectStore("blobs").put(blob, id); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); },
+    async get(id) { const db = await this.open(); if (!db) return null; return new Promise((res) => { const t = db.transaction("blobs", "readonly"); const q = t.objectStore("blobs").get(id); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); },
+    async del(id) { const db = await this.open(); if (!db) return; return new Promise((res) => { const t = db.transaction("blobs", "readwrite"); t.objectStore("blobs").delete(id); t.oncomplete = () => res(); t.onerror = () => res(); }); },
+  };
+
+  const DEFAULT_FOLDERS = ["Corporate Decks", "Solution Decks", "Case Studies", "One-Pagers", "Battlecards", "Pricing", "Proposals", "RFPs", "Contracts", "Other"];
+  const FILES = {
+    meta() { return LS.get("hono_files_meta", []); },
+    saveMeta(m) { LS.set("hono_files_meta", m); },
+    folders() { return LS.get("hono_folders", DEFAULT_FOLDERS.slice()); },
+    saveFolders(f) { LS.set("hono_folders", f); },
+    addFolder(name) { name = (name || "").trim(); const f = this.folders(); if (name && !f.includes(name)) { f.push(name); this.saveFolders(f); } return f; },
+    renameFolder(oldN, newN) { newN = (newN || "").trim(); if (!newN) return; const f = this.folders().map(x => x === oldN ? newN : x); this.saveFolders(f); const m = this.meta(); m.forEach(it => { if (it.folder === oldN) it.folder = newN; }); this.saveMeta(m); },
+    removeFolder(name) { this.saveFolders(this.folders().filter(x => x !== name)); const m = this.meta(); m.forEach(it => { if (it.folder === name) it.folder = "Other"; }); this.saveMeta(m); },
+    async upload(file, folder) {
+      const id = "f" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      await FDB.put(id, file);
+      const m = this.meta();
+      m.push({ id, name: file.name, folder: folder || "Other", ext: (file.name.split(".").pop() || "").toLowerCase(), size: file.size, added: new Date().toISOString().slice(0, 16).replace("T", " ") });
+      this.saveMeta(m); return id;
+    },
+    async remove(id) { await FDB.del(id); this.saveMeta(this.meta().filter(x => x.id !== id)); },
+    rename(id, name) { const m = this.meta(); const it = m.find(x => x.id === id); if (it && name) { it.name = name; this.saveMeta(m); } },
+    move(id, folder) { const m = this.meta(); const it = m.find(x => x.id === id); if (it) { it.folder = folder; this.saveMeta(m); } },
+    async download(id) { const it = this.meta().find(x => x.id === id); const blob = await FDB.get(id); if (blob) dl(it ? it.name : "file", blob instanceof Blob ? blob : new Blob([blob])); },
+    async open(id) { const blob = await FDB.get(id); if (blob) { const url = URL.createObjectURL(blob instanceof Blob ? blob : new Blob([blob])); window.open(url, "_blank"); setTimeout(() => URL.revokeObjectURL(url), 60000); } },
+    async usage() { try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); return { used: e.usage || 0, quota: e.quota || 0 }; } } catch (e) {} return null; },
+  };
+
+  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, FILES, readSheetRows, writeXlsx, tokens, cosine };
 })();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sales Assets — HONO Sales OS</title>
+<title>Asset Library — HONO Sales Toolkit</title>
 <script src="hono-portal.js"></script>
 <style>
 :root{--ink:#0f1222;--ink2:#3a3f5c;--muted:#6b7192;--brand:#4f46e5;--brand2:#7c3aed;--teal:#0ea5a4;
@@ -13,7 +13,7 @@
 .mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:800;margin-right:6px}
 .nav{color:#c9cbe8;font-weight:700;font-size:13px;padding:8px 12px;border-radius:9px;text-decoration:none}
 .nav:hover{background:rgba(255,255,255,.08);color:#fff}.nav.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
-.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(14,165,164,.2);color:#8be0df;padding:5px 10px;border-radius:999px}
+.badge-priv{margin-left:auto;font-size:11px;font-weight:700;background:rgba(37,99,235,.2);color:#93c5fd;padding:5px 10px;border-radius:999px}
 .wrap{max-width:1100px;margin:0 auto;padding:22px}
 h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px}
@@ -21,55 +21,58 @@ h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13.5px;margin
 .cb{padding:16px 18px}
 label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin:0 0 5px}
 input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;outline:none;background:#fff}
-.btn{height:40px;padding:0 16px;border:0;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.btn{height:38px;padding:0 15px;border:0;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
 .btn.sec{background:#fff;color:var(--brand);border:1px solid var(--brand)}
 .muted{color:var(--muted);font-size:12px}
-.uprow{display:grid;grid-template-columns:200px 1fr 1fr auto;gap:10px;align-items:end}
+.uprow{display:grid;grid-template-columns:190px 1fr 1fr auto;gap:10px;align-items:end}
 .cat{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
 .cat h3{margin:0;padding:12px 15px;background:var(--soft);font-size:14px;display:flex;justify-content:space-between}
 .file{display:flex;align-items:center;gap:11px;padding:11px 15px;border-top:1px solid var(--line)}
-.ft{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#fff;flex:none;background:#64748b}
-.file a{font-size:12px;font-weight:700;color:var(--brand);text-decoration:none}
-.file .rm{margin-left:auto;color:var(--bad);cursor:pointer;font-weight:800;border:0;background:none;font-size:15px}
+.ft{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:800;color:#fff;flex:none}
+.pptx,.ppt{background:#c43e1c}.pdf{background:#e11d2f}.docx,.doc{background:#2b579a}.xlsx,.xls,.csv{background:#207245}.other{background:#64748b}
+.file a.open{margin-left:auto;font-size:12px;font-weight:800;color:var(--brand);text-decoration:none;white-space:nowrap}
+.file .rm{color:#dc2626;cursor:pointer;font-weight:800;border:0;background:none;font-size:15px}
 .res{background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25);border-radius:10px;padding:9px 13px;margin-top:12px;font-size:12.5px;font-weight:700}
-.hint{background:rgba(14,165,164,.08);border:1px solid rgba(14,165,164,.25);color:#0b6b6a;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:600;margin-bottom:14px}
+.hint{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);color:#1e40af;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:600;margin-bottom:14px}
 @media(max-width:820px){.uprow{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="top">
   <div class="mark">H</div>
-  <a class="nav" href="index.html">Dashboard</a>
+  <a class="nav" href="index.html">Home</a>
   <a class="nav" href="studio.html">Proposal Studio</a>
+  <a class="nav" href="files.html">Files</a>
+  <a class="nav on" href="decks.html">Assets</a>
   <a class="nav" href="rfp.html">RFP Library</a>
-  <a class="nav on" href="decks.html">Sales Assets</a>
-  <span class="badge-priv">🌐 Runs in your browser</span>
+  <span class="badge-priv">☁ Linked to SharePoint</span>
 </div>
 <div class="wrap">
-  <h1>Sales Assets</h1>
-  <div class="sub">One catalog for the whole team: corporate deck, solution decks, case studies, one-pagers, battlecards and price sheets — link each to where it lives (SharePoint / OneDrive), always the current version.</div>
-  <div class="hint">🔒 Store your decks on SharePoint/OneDrive and add the link here. The catalog lives in this browser — use Export/Import to share it with the team (or commit the exported file to the repo as the shared catalog).</div>
+  <h1>Asset Library</h1>
+  <div class="sub">Your key decks, proposals, case studies and RFPs — each opens the live file in SharePoint (nothing copied, always the current version). Add more links anytime; use Export/Import to share your list.</div>
+  <div class="hint">☁ These point to your real files on SharePoint/OneDrive. You need to be signed in to SharePoint (same as normal) to open them. Files stay in their existing folders — this is just a fast index.</div>
 
   <div class="card">
-    <div class="ch">Add an asset
-      <span style="display:flex;gap:8px"><button class="btn sec" onclick="exportCat()">⬇ Export catalog</button>
-        <label class="btn sec" style="cursor:pointer;line-height:40px" for="impcat">⬆ Import</label>
-        <input id="impcat" type="file" accept=".json" style="display:none" onchange="importCat(this)"></span>
+    <div class="ch">Add an asset link
+      <span style="display:flex;gap:8px"><button class="btn sec" onclick="exportCat()">⬇ Export</button>
+        <label class="btn sec" style="cursor:pointer;line-height:38px" for="impcat">⬆ Import</label>
+        <input id="impcat" type="file" accept=".json" style="display:none" onchange="importCat(this)">
+        <button class="btn sec" onclick="reseed()">↺ Reset to defaults</button></span>
     </div>
     <div class="cb">
       <div class="uprow">
         <div><label>Category</label><select id="cat"></select></div>
-        <div><label>Title</label><input id="title" placeholder="HONO Corporate Deck 2026"></div>
-        <div><label>Link (SharePoint / OneDrive / URL)</label><input id="link" placeholder="https://…"></div>
+        <div><label>Title</label><input id="title" placeholder="HONO Proposal — Client"></div>
+        <div><label>SharePoint link</label><input id="link" placeholder="https://…sharepoint.com/…"></div>
         <button class="btn" onclick="add()">Add</button>
       </div>
-      <div style="margin-top:10px"><label>Version / note (optional)</label><input id="ver" placeholder="v3 · approved · EN" style="max-width:320px"></div>
+      <div style="margin-top:10px"><label>Version / note (optional)</label><input id="ver" placeholder="v2 · approved · EN" style="max-width:320px"></div>
       <div id="upout"></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="ch">Library</div>
+    <div class="ch">Library <span class="muted" id="count"></span></div>
     <div class="cb">
       <input id="q" placeholder="🔎 Search assets…" oninput="render()" style="margin-bottom:14px">
       <div id="lib"><p class="muted">Loading…</p></div>
@@ -78,32 +81,58 @@ input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const CATS=["Corporate Decks","Solution Decks","Case Studies","One-Pagers","Battlecards","Pricing","Other"];
+const CATS=["Corporate Decks","Solution Decks","Case Studies","Proposals","RFP Library","Pricing","Other"];
 $('cat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
-function esc(s){return (s==null?'':String(s)).replace(/</g,'&lt;');}
-function ftlabel(link){const m=(link||'').split('.').pop().split(/[?#]/)[0].toUpperCase();return m.length<=4?m:'LINK';}
+function esc(s){return (s==null?'':String(s)).replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function extOf(link){const m=(link||'').split(/[?#]/)[0].split('.').pop().toLowerCase();return ['pptx','ppt','pdf','docx','doc','xlsx','xls','csv'].includes(m)?m:'other';}
+
+// Curated starter library seeded from your SharePoint (real files, live links)
+const DEFAULT_CATALOG=[
+  {category:"Corporate Decks",title:"HONO Corporate Deck (30.03.26)",version:"latest",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/corporate deck update/HONO Corporate Deck 30.03.26_.pptx"},
+  {category:"Corporate Decks",title:"HONO Corporate Deck SEA (3.3.26)",version:"SEA",link:"https://sequelone-my.sharepoint.com/personal/natthaya_areekul_hono_ai/Documents/Microsoft Teams Chat Files/HONO Corporate Deck SEA 3.3.26 (1).pptx"},
+  {category:"Case Studies",title:"NBC Bearings — Case Study",version:"PDF",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/sharedeck/case studies/NBC Case Study.pdf"},
+  {category:"Case Studies",title:"Accor — Case Study",version:"20.01.2024",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/Accor Case Study updated 20.01.2024.pptx"},
+  {category:"Case Studies",title:"Healthcare — Case Study",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/Dr. Surapit/Aikchol/Healthcare Case Study.pptx"},
+  {category:"Case Studies",title:"Thai Re (BFSI) — Case Study",version:"DOCX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/Microsoft Teams Chat Files/Case Study_BFSI_ThaiRe (1).docx"},
+  {category:"Proposals",title:"National Power Supply — Proposal",version:"05.07.2026",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/Microsoft Teams Chat Files/HONO_HCM Proposal_05072026_NPS.docx"},
+  {category:"Proposals",title:"TOTO — Proposal",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/TOTO/HONO Proposal_TOTO.pptx"},
+  {category:"Proposals",title:"MGC — Proposal",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/MGC/HONO Proposal_MGC.pptx"},
+  {category:"Proposals",title:"Toyota Tsusho — Proposal",version:"PDF",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/Toyota TSUSHO/HONO Proposal_Toyota Tsusho.pdf"},
+  {category:"Proposals",title:"GPV — Proposal",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/GPV/HONO Proposal_GPV.pptx"},
+  {category:"Proposals",title:"Bangkok PVC — Proposal",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/BKK PVC/HONO Proposal_Bangkok PVC.pptx"},
+  {category:"Proposals",title:"KCG — Proposal",version:"PPTX",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/KCG/HONO Proposal_KCG.pptx"},
+  {category:"Proposals",title:"EuroP — Proposal",version:"PDF",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Suntisuk/Deal/EUROP/HONO Proposal_EuroP.pdf"},
+  {category:"RFP Library",title:"RFP Standard Responses (answer bank)",version:"master",link:"https://sequelone-my.sharepoint.com/personal/sheetal_gulati_hono_ai/Documents/RFP(1)/RFP Central Repository/India North RFPs/RFP Standrad Responses.xlsx"},
+  {category:"RFP Library",title:"LTAT RFP Requirements (filled)",version:"SEA RFP",link:"https://sequelone-my.sharepoint.com/personal/sheetal_gulati_hono_ai/Documents/RFP(1)/RFP Central Repository/SEA RFP/LTAT RFP Requirements (FINAL) - MODIFIED (INTERNAL) (1).xlsx"},
+  {category:"RFP Library",title:"RFP — Wasport (Thailand)",version:"filled",link:"https://sequelone-my.sharepoint.com/personal/sheetal_gulati_hono_ai/Documents/RFP(1)/RFP Central Repository/RFP_Thailand/RFP- Wasport.xlsx"},
+  {category:"RFP Library",title:"EFD HR & Payroll RFP",version:"Wasco",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/share folder/Customer/Partner Lead/Wasco/EFD HR  Payroll RFP.docx"},
+  {category:"RFP Library",title:"BPI — Filled RFP Responses (signed)",version:"Philippines",link:"https://sequelone-my.sharepoint.com/personal/boonchoo_malhotra_hono_ai/Documents/natthaya.areekul@hono.ai/OneDrive - Sequel One Solutions Pvt (1). Ltd/Customer/Philipine/BPI/Signed_BPI_HONO Filled RFP Responses_30080124_22112024.docx"}
+];
+
+function catalog(){ let c=HONO.ASSETS.all(); if(!c.length){ HONO.ASSETS.save(DEFAULT_CATALOG.map(x=>Object.assign({added:'seeded'},x))); c=HONO.ASSETS.all(); } return c; }
 function add(){
   const title=$('title').value.trim(),link=$('link').value.trim();
   if(!title||!link){alert('Title and link are required');return;}
   HONO.ASSETS.add({category:$('cat').value,title,link,version:$('ver').value.trim()});
   $('title').value='';$('link').value='';$('ver').value='';
-  $('upout').innerHTML=`<div class="res">✓ Added “${esc(title)}” to ${$('cat').value}.</div>`;render();
+  $('upout').innerHTML=`<div class="res">✓ Added “${esc(title)}”.</div>`;render();
 }
 function render(){
   const q=($('q').value||'').toLowerCase().trim();
-  const all=HONO.ASSETS.all();
-  if(!all.length){$('lib').innerHTML='<p class="muted">No assets yet — add your first deck link above.</p>';return;}
-  const byCat={};all.forEach((a,i)=>{a._i=i;if(q&&!(a.title.toLowerCase().includes(q)||a.category.toLowerCase().includes(q)))return;(byCat[a.category]=byCat[a.category]||[]).push(a);});
+  const all=catalog().map((a,i)=>Object.assign({_i:i},a));
+  $('count').textContent=all.length+' assets';
+  const byCat={};all.forEach(a=>{ if(q&&!(a.title.toLowerCase().includes(q)||a.category.toLowerCase().includes(q)))return; (byCat[a.category]=byCat[a.category]||[]).push(a); });
   const cats=CATS.filter(c=>byCat[c]&&byCat[c].length);
-  if(!cats.length){$('lib').innerHTML='<p class="muted">No matches.</p>';return;}
+  if(!cats.length){$('lib').innerHTML='<p class="muted">'+(q?'No matches.':'No assets yet.')+'</p>';return;}
   $('lib').innerHTML=cats.map(c=>`<div class="cat"><h3><span>${c}</span><span class="muted">${byCat[c].length}</span></h3>
-    ${byCat[c].map(a=>`<div class="file"><div class="ft">${ftlabel(a.link)}</div>
+    ${byCat[c].map(a=>{const e=extOf(a.link);return `<div class="file"><div class="ft ${e}">${e.toUpperCase().slice(0,4)}</div>
       <div><div style="font-weight:700;font-size:13px">${esc(a.title)}</div><div class="muted">${a.version?esc(a.version)+' · ':''}${esc(a.added||'')}</div></div>
-      <a href="${esc(a.link)}" target="_blank" rel="noopener" style="margin-left:auto">Open ↗</a>
-      <button class="rm" title="Remove" onclick="HONO.ASSETS.remove(${a._i});render();">×</button></div>`).join('')}</div>`).join('');
+      <a class="open" href="${encodeURI(a.link)}" target="_blank" rel="noopener">Open in SharePoint ↗</a>
+      <button class="rm" title="Remove" onclick="HONO.ASSETS.remove(${a._i});render();">×</button></div>`;}).join('')}</div>`).join('');
 }
-function exportCat(){HONO.dlText('hono_sales_assets.json',JSON.stringify(HONO.ASSETS.all(),null,1));}
+function exportCat(){HONO.dlText('hono_asset_library.json',JSON.stringify(catalog(),null,1));}
 async function importCat(inp){const f=inp.files[0];if(!f)return;try{const arr=JSON.parse(await f.text());if(!Array.isArray(arr))throw new Error('bad file');HONO.ASSETS.save(arr);render();alert('Imported '+arr.length+' assets.');}catch(e){alert('Could not import: '+e.message);}}
+function reseed(){if(confirm('Reset the library to the seeded SharePoint defaults? This replaces your current list.')){HONO.ASSETS.save(DEFAULT_CATALOG.map(x=>Object.assign({added:'seeded'},x)));render();}}
 render();
 </script>
 </body>

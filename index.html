@@ -254,57 +254,66 @@ const STAGES = [
 ];
 const stageProb = k => (STAGES.find(s=>s.k===k)||{p:0}).p;
 
-// Live SEA pipeline — duplicated from the SEA Weekly Dashboard (Jun 2026 snapshot)
-const DEALS = [
-  {id:"8596192495", acct:"Max's Group - New Deal", mkt:"Philippines", stage:"Proposal", value:218400, emp:2700, ind:"Partner", owner:"PH Team", close:"2027-06-30", health:60},
-  {id:"493651891403", acct:"Polytron Indonesia", mkt:"Indonesia", stage:"Discovery", value:0, emp:5000, ind:"Sales", owner:"ID Team", close:"2026-12-31", health:30},
-  {id:"193935600873", acct:"Okada", mkt:"Philippines", stage:"Discovery", value:90000, emp:12000, ind:"Partner", owner:"PH Team", close:"2027-03-31", health:40},
-  {id:"339992582371", acct:"National Bureau of Investigation (NBI)", mkt:"Philippines", stage:"Proposal", value:160000, emp:4000, ind:"Partner", owner:"PH Team", close:"2026-12-31", health:50},
-  {id:"473244653777", acct:"Otten Coffee", mkt:"Indonesia", stage:"Proposal", value:29250, emp:250, ind:"Sales", owner:"ID Team", close:"2026-10-30", health:40},
-  {id:"379729670388", acct:"Cognizant", mkt:"Philippines", stage:"Discovery", value:108000, emp:4000, ind:"Others/Referrals", owner:"PH Team", close:"2026-11-30", health:40},
-  {id:"129537318081", acct:"National Power Supply", mkt:"Thailand", stage:"Discovery", value:173000, emp:2200, ind:"Sales", owner:"SEA HQ", close:"—", health:30},
-  {id:"351130684663", acct:"Nutriasia", mkt:"Philippines", stage:"Discovery", value:47000, emp:1000, ind:"Others/Referrals", owner:"PH Team", close:"2026-10-30", health:40},
-  {id:"496653097202", acct:"Inspiro - New Deal", mkt:"Philippines", stage:"Discovery", value:450000, emp:10000, ind:"Others/Referrals", owner:"PH Team", close:"2026-11-30", health:40},
-  {id:"258180625649", acct:"McDonald's Thailand (McThai Co.,Ltd.)", mkt:"Thailand", stage:"Proposal", value:200000, emp:6500, ind:"Sales", owner:"SEA HQ", close:"—", health:60},
-  {id:"502011290855", acct:"Unioil New Deal", mkt:"Philippines", stage:"Proposal", value:43000, emp:400, ind:"Marketing", owner:"PH Team", close:"2026-09-30", health:50},
-  {id:"10046652116", acct:"PowerMac Center", mkt:"Philippines", stage:"Discovery", value:142500, emp:3000, ind:"Marketing", owner:"PH Team", close:"2026-09-30", health:50},
-  {id:"351254128830", acct:"Yazaki-Torres", mkt:"Philippines", stage:"Discovery", value:72000, emp:2000, ind:"Others/Referrals", owner:"PH Team", close:"2026-09-30", health:60},
-  {id:"427315168501", acct:"Busana Remaja Agaracipta", mkt:"Indonesia", stage:"Proposal", value:259200, emp:12000, ind:"Management", owner:"ID Team", close:"2026-11-30", health:40},
-  {id:"216255209695", acct:"AmBank", mkt:"Malaysia", stage:"Proposal", value:544000, emp:7000, ind:"Partner", owner:"MY Team", close:"2026-11-30", health:50},
-  {id:"306812321989", acct:"Panasonic Gobel Indonesia", mkt:"Indonesia", stage:"Proposal", value:57600, emp:400, ind:"Partner", owner:"ID Team", close:"2026-08-31", health:30},
-  {id:"12803846843", acct:"Osotspa", mkt:"Thailand", stage:"Qualify", value:188160, emp:2000, ind:"Sales", owner:"SEA HQ", close:"2026-11-30", health:50},
-  {id:"496652367053", acct:"Digital Workforce PH - New Deal", mkt:"Philippines", stage:"Discovery", value:18000, emp:100, ind:"Marketing", owner:"PH Team", close:"2026-07-31", health:70},
-  {id:"126359758029", acct:"BCA Syariah", mkt:"Indonesia", stage:"Proposal", value:61050, emp:850, ind:"Partner", owner:"ID Team", close:"2026-07-31", health:50},
-  {id:"286017173691", acct:"Jasa Angkasa Semesta (JAS)", mkt:"Indonesia", stage:"Proposal", value:122400, emp:4000, ind:"Partner", owner:"ID Team", close:"2026-06-30", health:70},
-  {id:"103713977545", acct:"Panin Bank", mkt:"Indonesia", stage:"Proposal", value:633392, emp:9000, ind:"Partner", owner:"ID Team", close:"2026-07-30", health:70},
-  {id:"TMP22", acct:"Ramkamhaeng Hospital", mkt:"Thailand", stage:"Qualify", value:112896, emp:1200, ind:"Partner", owner:"SEA HQ", close:"2026-11-30", health:30},
-  {id:"15487249117", acct:"Kapal Api Group", mkt:"Indonesia", stage:"Proposal", value:248800, emp:16500, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:60},
-  {id:"TMP24", acct:"Naraesuan University", mkt:"Thailand", stage:"Qualify", value:80000, emp:240, ind:"Sales", owner:"SEA HQ", close:"2026-10-30", health:60},
-  {id:"193860419776", acct:"PNB HR", mkt:"Philippines", stage:"Proposal", value:113556, emp:9000, ind:"Partner", owner:"PH Team", close:"2026-06-30", health:60},
-  {id:"499826487512", acct:"Supra Bara Energi", mkt:"Indonesia", stage:"Discovery", value:77000, emp:700, ind:"Referral", owner:"ID Team", close:"2026-08-31", health:60},
-  {id:"496647854279", acct:"Philippine Transmarine Carriers (PTC) - Vinta", mkt:"Philippines", stage:"Proposal", value:30000, emp:60, ind:"Sales", owner:"PH Team", close:"2026-07-31", health:50},
-  {id:"205288072422", acct:"Philippine Transmarine Carriers (PTC)", mkt:"Philippines", stage:"Proposal", value:88100, emp:2100, ind:"Partner", owner:"PH Team", close:"2026-06-30", health:90},
-  {id:"420133431526", acct:"MAKA Group", mkt:"Indonesia", stage:"Discovery", value:142500, emp:1500, ind:"Marketing", owner:"ID Team", close:"2026-09-30", health:50},
-  {id:"135770848467", acct:"Asia Plus Group Holdings PCL - New Deal", mkt:"Thailand", stage:"Discovery", value:62212, emp:700, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30},
-  {id:"413524599027", acct:"MGC-Asia - New Deal", mkt:"Thailand", stage:"Discovery", value:145636, emp:3000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:40},
-  {id:"495032744134", acct:"Siam Piwat", mkt:"Thailand", stage:"Discovery", value:0, emp:1200, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30},
-  {id:"499545492708", acct:"Srikrung Wattana", mkt:"Thailand", stage:"Qualify", value:55000, emp:500, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30},
-  {id:"503037372615", acct:"GPV", mkt:"Thailand", stage:"Qualify", value:101872, emp:2000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30},
-  {id:"502402815168", acct:"Torre Lorenzo Development Corp", mkt:"Philippines", stage:"Discovery", value:14250, emp:500, ind:"Marketing", owner:"PH Team", close:"2026-11-30", health:40},
-  {id:"502454590697", acct:"DFI Retail Nusantara (Ikea Indonesia)", mkt:"Indonesia", stage:"Discovery", value:119700, emp:5000, ind:"Sales", owner:"ID Team", close:"2026-11-30", health:40},
-  {id:"502454033650", acct:"Zouk", mkt:"Singapore", stage:"Discovery", value:59000, emp:350, ind:"Marketing", owner:"SEA HQ", close:"2026-09-30", health:60},
-  {id:"504048476385", acct:"Double A", mkt:"Thailand", stage:"Qualify", value:282240, emp:3000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30},
-  {id:"237747296457", acct:"Chia Tai Company Limited - New Deal", mkt:"Thailand", stage:"Negotiation", value:52549, emp:550, ind:"Sales", owner:"SEA HQ", close:"2026-08-31", health:90},
-  {id:"472986056894", acct:"Trax Intertrade", mkt:"Thailand", stage:"Discovery", value:137454, emp:4000, ind:"Partner", owner:"SEA HQ", close:"2026-08-30", health:40},
-  {id:"16604226040", acct:"MSIG", mkt:"Thailand", stage:"Qualify", value:70000, emp:750, ind:"Sales", owner:"SEA HQ", close:"2026-08-30", health:40},
-  {id:"17658581203", acct:"Europ", mkt:"Malaysia", stage:"Qualify", value:38000, emp:400, ind:"Sales", owner:"MY Team", close:"2026-09-30", health:40},
-  {id:"466920008947", acct:"Asset World", mkt:"Thailand", stage:"Discovery", value:75600, emp:1200, ind:"Partner", owner:"SEA HQ", close:"2026-07-30", health:60},
-  {id:"420946178244", acct:"Apex Security", mkt:"Malaysia", stage:"Proposal", value:41500, emp:180, ind:"Partner", owner:"MY Team", close:"2026-06-30", health:60},
-  {id:"466921438416", acct:"Thai Nippon Steel", mkt:"Thailand", stage:"Discovery", value:0, emp:0, ind:"Sales", owner:"SEA HQ", close:"—", health:30},
-  {id:"432363985137", acct:"Nippon Indosari Corporindo (Sari Roti)", mkt:"Indonesia", stage:"Discovery", value:238581, emp:6600, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:30},
-  {id:"TMP49", acct:"Jaspal", mkt:"Thailand", stage:"Discovery", value:310000, emp:3500, ind:"Sales", owner:"SEA HQ", close:"2026-08-30", health:60},
-  {id:"432363985138", acct:"Nippon Indosari Corpindo Tbk (Sari Roti)", mkt:"Indonesia", stage:"Discovery", value:199500, emp:6650, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:40}
+// Working copy of the SEA pipeline — duplicated from the SEA Weekly Dashboard (Jun 2026). Editable in this browser; your source dashboard is never touched.
+const SEED_DEALS = [
+  {id:"8596192495", acct:'Max\'s Group - New Deal', mkt:"Philippines", stage:"Proposal", value:218400, emp:2700, ind:"Partner", owner:"PH Team", close:"2027-06-30", health:60, remarks:'Try to connect with Max\'s IT and/or HR Head and rekindle discussions'},
+  {id:"493651891403", acct:'Polytron Indonesia', mkt:"Indonesia", stage:"Discovery", value:0, emp:5000, ind:"Sales", owner:"ID Team", close:"2026-12-31", health:30, remarks:'Follow up Pak Adhi since April and weekly based but no response'},
+  {id:"193935600873", acct:'Okada', mkt:"Philippines", stage:"Discovery", value:90000, emp:12000, ind:"Partner", owner:"PH Team", close:"2027-03-31", health:40, remarks:'Finalizing small POC on 201 files with Nilkhil, then align with Gerard (partner) on presenting to Okada'},
+  {id:"339992582371", acct:'National Bureau of Investigation (NBI)', mkt:"Philippines", stage:"Proposal", value:160000, emp:4000, ind:"Partner", owner:"PH Team", close:"2026-12-31", health:50, remarks:'Remax (partner) determining next steps with NBI, amidst budget cuts'},
+  {id:"473244653777", acct:'Otten Coffee', mkt:"Indonesia", stage:"Proposal", value:29250, emp:250, ind:"Sales", owner:"ID Team", close:"2026-10-30", health:40, remarks:'Try to connect but no response from Pak Redy. Otten is the sister company of Fore'},
+  {id:"379729670388", acct:'Cognizant', mkt:"Philippines", stage:"Discovery", value:108000, emp:4000, ind:"Others/Referrals", owner:"PH Team", close:"2026-11-30", health:40, remarks:'Resuming talks with CEO by June 2026'},
+  {id:"129537318081", acct:'National Power Supply', mkt:"Thailand", stage:"Discovery", value:173000, emp:2200, ind:"Sales", owner:"SEA HQ", close:"—", health:30, remarks:'Wait for confirmation on shortlisted in June'},
+  {id:"351130684663", acct:'Nutriasia', mkt:"Philippines", stage:"Discovery", value:47000, emp:1000, ind:"Others/Referrals", owner:"PH Team", close:"2026-10-30", health:40, remarks:'Interested in Recruitment module (ATS). Meeting and demo to be set before end June 2026'},
+  {id:"496653097202", acct:'Inspiro - New Deal', mkt:"Philippines", stage:"Discovery", value:450000, emp:10000, ind:"Others/Referrals", owner:"PH Team", close:"2026-11-30", health:40, remarks:'Inspiro Procurement not yet set the schedule. On follow up'},
+  {id:"258180625649", acct:'McDonald\'s Thailand (McThai Co.,Ltd.)', mkt:"Thailand", stage:"Proposal", value:200000, emp:6500, ind:"Sales", owner:"SEA HQ", close:"—", health:60, remarks:'Sent the response to the requirement on 4th March. Project delay to Q2 2026. Follow up again end of April, scheduling demo session in June'},
+  {id:"502011290855", acct:'Unioil New Deal', mkt:"Philippines", stage:"Proposal", value:43000, emp:400, ind:"Marketing", owner:"PH Team", close:"2026-09-30", health:50, remarks:'Wants to move out of Darwinbox by October 2026. Proposal was shared, customer reference call done. Unioil to provide feedback by June 15'},
+  {id:"10046652116", acct:'PowerMac Center', mkt:"Philippines", stage:"Discovery", value:142500, emp:3000, ind:"Marketing", owner:"PH Team", close:"2026-09-30", health:50, remarks:'Ongoing build of the list of requirements before project resumption'},
+  {id:"351254128830", acct:'Yazaki-Torres', mkt:"Philippines", stage:"Discovery", value:72000, emp:2000, ind:"Others/Referrals", owner:"PH Team", close:"2026-09-30", health:60, remarks:'Proposal under review. Will meet POC on June 17-18 to resolve commercials'},
+  {id:"427315168501", acct:'Busana Remaja Agaracipta', mkt:"Indonesia", stage:"Proposal", value:259200, emp:12000, ind:"Management", owner:"ID Team", close:"2026-11-30", health:40, remarks:'Cost above current budget; no management approval at this stage.'},
+  {id:"216255209695", acct:'AmBank', mkt:"Malaysia", stage:"Proposal", value:544000, emp:7000, ind:"Partner", owner:"MY Team", close:"2026-11-30", health:50, remarks:'Sent updated proposal and compliance sheet. Rams following up. No movement. Tentatively March will release RFP'},
+  {id:"306812321989", acct:'Panasonic Gobel Indonesia', mkt:"Indonesia", stage:"Proposal", value:57600, emp:400, ind:"Partner", owner:"ID Team", close:"2026-08-31", health:30, remarks:'Update from Ramssol: Prospect not responding'},
+  {id:"12803846843", acct:'Osotspa', mkt:"Thailand", stage:"Qualify", value:188160, emp:2000, ind:"Sales", owner:"SEA HQ", close:"2026-11-30", health:50, remarks:'TOR response'},
+  {id:"496652367053", acct:'Digital Workforce PH - New Deal', mkt:"Philippines", stage:"Discovery", value:18000, emp:100, ind:"Marketing", owner:"PH Team", close:"2026-07-31", health:70, remarks:'Proposal submitted; awaiting decision.'},
+  {id:"126359758029", acct:'BCA Syariah', mkt:"Indonesia", stage:"Proposal", value:61050, emp:850, ind:"Partner", owner:"ID Team", close:"2026-07-31", health:50, remarks:'Will update on Career Planning and Succession Planning not yet in Demo.'},
+  {id:"286017173691", acct:'Jasa Angkasa Semesta (JAS)', mkt:"Indonesia", stage:"Proposal", value:122400, emp:4000, ind:"Partner", owner:"ID Team", close:"2026-06-30", health:70, remarks:'Commercial shared with procurement; BOD decision based on 19 May demo and T&C scoring is awaiting.'},
+  {id:"103713977545", acct:'Panin Bank', mkt:"Indonesia", stage:"Proposal", value:633392, emp:9000, ind:"Partner", owner:"ID Team", close:"2026-07-30", health:70, remarks:'Need to share another clarification, analysis, and solution assessment.'},
+  {id:"TMP22", acct:'Ramkamhaeng Hospital', mkt:"Thailand", stage:"Qualify", value:112896, emp:1200, ind:"Partner", owner:"SEA HQ", close:"2026-11-30", health:30, remarks:'Scheduling overview session'},
+  {id:"15487249117", acct:'Kapal Api Group', mkt:"Indonesia", stage:"Proposal", value:248800, emp:16500, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:60, remarks:'Follow up every week but no response'},
+  {id:"TMP24", acct:'Naraesuan University', mkt:"Thailand", stage:"Qualify", value:80000, emp:240, ind:"Sales", owner:"SEA HQ", close:"2026-10-30", health:60, remarks:'Draft TOR and budget approval is in process (June)'},
+  {id:"193860419776", acct:'PNB HR', mkt:"Philippines", stage:"Proposal", value:113556, emp:9000, ind:"Partner", owner:"PH Team", close:"2026-06-30", health:60, remarks:'No movement until today; connecting with Dennis to know presentation schedule to Board'},
+  {id:"499826487512", acct:'Supra Bara Energi', mkt:"Indonesia", stage:"Discovery", value:77000, emp:700, ind:"Referral", owner:"ID Team", close:"2026-08-31", health:60, remarks:'CEO concerns on integration & shift/punch capture addressed; demo to be aligned.'},
+  {id:"496647854279", acct:'Philippine Transmarine Carriers (PTC) - Vinta', mkt:"Philippines", stage:"Proposal", value:30000, emp:60, ind:"Sales", owner:"PH Team", close:"2026-07-31", health:50, remarks:'Finishing PTC first; will submit commercials afterwards'},
+  {id:"205288072422", acct:'Philippine Transmarine Carriers (PTC)', mkt:"Philippines", stage:"Proposal", value:88100, emp:2100, ind:"Partner", owner:"PH Team", close:"2026-06-30", health:90, remarks:'CHRO, CFO, CTO approved. Pending with CEO for final approval before signature. Due 5 June.'},
+  {id:"420133431526", acct:'MAKA Group', mkt:"Indonesia", stage:"Discovery", value:142500, emp:1500, ind:"Marketing", owner:"ID Team", close:"2026-09-30", health:50, remarks:'Interest in full HR suite. Further PMS session to be set.'},
+  {id:"135770848467", acct:'Asia Plus Group Holdings PCL - New Deal', mkt:"Thailand", stage:"Discovery", value:62212, emp:700, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30, remarks:'Client summarizing data to present management team for budgeting. Will decide by Q3 2026.'},
+  {id:"413524599027", acct:'MGC-Asia - New Deal', mkt:"Thailand", stage:"Discovery", value:145636, emp:3000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:40, remarks:'Spoke with client 6th May, next meeting to be scheduled by 21st May'},
+  {id:"495032744134", acct:'Siam Piwat', mkt:"Thailand", stage:"Discovery", value:0, emp:1200, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30, remarks:'Demo scheduling in June'},
+  {id:"499545492708", acct:'Srikrung Wattana', mkt:"Thailand", stage:"Qualify", value:55000, emp:500, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30, remarks:'Comparing functionality vs other vendors; will respond on shortlist'},
+  {id:"503037372615", acct:'GPV', mkt:"Thailand", stage:"Qualify", value:101872, emp:2000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30, remarks:'Scheduling overview session'},
+  {id:"502402815168", acct:'Torre Lorenzo Development Corp', mkt:"Philippines", stage:"Discovery", value:14250, emp:500, ind:"Marketing", owner:"PH Team", close:"2026-11-30", health:40, remarks:'Had 2nd demo on June 3; working on proposal'},
+  {id:"502454590697", acct:'DFI Retail Nusantara (Ikea Indonesia)', mkt:"Indonesia", stage:"Discovery", value:119700, emp:5000, ind:"Sales", owner:"ID Team", close:"2026-11-30", health:40, remarks:'Met DFI head of HR Indo; shared quotation + 1 other vendor to regional office.'},
+  {id:"502454033650", acct:'Zouk', mkt:"Singapore", stage:"Discovery", value:59000, emp:350, ind:"Marketing", owner:"SEA HQ", close:"2026-09-30", health:60, remarks:'Gave proposal to Zouk after May demo. Awaiting feedback'},
+  {id:"504048476385", acct:'Double A', mkt:"Thailand", stage:"Qualify", value:282240, emp:3000, ind:"Sales", owner:"SEA HQ", close:"2026-09-30", health:30, remarks:'Scheduling overview session'},
+  {id:"237747296457", acct:'Chia Tai Company Limited - New Deal', mkt:"Thailand", stage:"Negotiation", value:52549, emp:550, ind:"Sales", owner:"SEA HQ", close:"2026-08-31", health:90, remarks:'Ramssol to share who will speak with Mr Vinit from Indomas re Panin client reference scheduled 24 Apr'},
+  {id:"472986056894", acct:'Trax Intertrade', mkt:"Thailand", stage:"Discovery", value:137454, emp:4000, ind:"Partner", owner:"SEA HQ", close:"2026-08-30", health:40, remarks:'Deep dive demo to head of HR in each country; client needs time for internal transformation and budgeting.'},
+  {id:"16604226040", acct:'MSIG', mkt:"Thailand", stage:"Qualify", value:70000, emp:750, ind:"Sales", owner:"SEA HQ", close:"2026-08-30", health:40, remarks:'Demo complete, will get budget approved'},
+  {id:"17658581203", acct:'Europ', mkt:"Malaysia", stage:"Qualify", value:38000, emp:400, ind:"Sales", owner:"MY Team", close:"2026-09-30", health:40, remarks:'Client would like to explore HK and JP capability'},
+  {id:"466920008947", acct:'Asset World', mkt:"Thailand", stage:"Discovery", value:75600, emp:1200, ind:"Partner", owner:"SEA HQ", close:"2026-07-30", health:60, remarks:'Setting up client reference call. Last spoke 7th May'},
+  {id:"420946178244", acct:'Apex Security', mkt:"Malaysia", stage:"Proposal", value:41500, emp:180, ind:"Partner", owner:"MY Team", close:"2026-06-30", health:60, remarks:'Sent price to Ramssol team; client internally discussing and will get back.'},
+  {id:"466921438416", acct:'Thai Nippon Steel', mkt:"Thailand", stage:"Discovery", value:0, emp:0, ind:"Sales", owner:"SEA HQ", close:"—", health:30, remarks:'Need to follow up on next step'},
+  {id:"432363985137", acct:'Nippon Indosari Corporindo (Sari Roti)', mkt:"Indonesia", stage:"Discovery", value:238581, emp:6600, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:30, remarks:'Shared revised quotation; VP to share scenario for next demo.'},
+  {id:"TMP49", acct:'Jaspal', mkt:"Thailand", stage:"Discovery", value:310000, emp:3500, ind:"Sales", owner:"SEA HQ", close:"2026-08-30", health:60, remarks:'No budget approved for this year'},
+  {id:"432363985138", acct:'Nippon Indosari Corpindo Tbk (Sari Roti)', mkt:"Indonesia", stage:"Discovery", value:199500, emp:6650, ind:"Sales", owner:"ID Team", close:"2026-09-30", health:40, remarks:'Shared quotation in April; they want another demo with VP online 5 June.'}
 ];
+
+let DEALS = (()=>{try{const s=JSON.parse(localStorage.getItem('hono_deals'));return (s&&s.length)?s:null;}catch(e){return null;}})() || SEED_DEALS.map(d=>({...d}));
+function saveDeals(){try{localStorage.setItem('hono_deals',JSON.stringify(DEALS));}catch(e){}}
+function resetDeals(){if(confirm('Reset the portal pipeline to the SEA Weekly Dashboard snapshot? This discards edits made in this browser.')){DEALS=SEED_DEALS.map(d=>({...d}));saveDeals();go('pipeline');}}
+function exportDeals(){const b=new Blob([JSON.stringify(DEALS,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='hono_sea_pipeline.json';document.body.appendChild(a);a.click();a.remove();}
+function importDeals(inp){const f=inp.files[0];if(!f)return;f.text().then(t=>{try{const arr=JSON.parse(t);if(Array.isArray(arr)&&arr.length){DEALS=arr;saveDeals();go('pipeline');}else alert('No deals in file');}catch(e){alert('Could not read file');}});}
+function newDeal(){const id='N'+Date.now();DEALS.push({id,acct:'New deal',mkt:'Indonesia',stage:'Qualify',value:0,emp:0,ind:'Sales',owner:'SEA HQ',close:'',health:30,remarks:''});saveDeals();openDeal(id);}
+function deleteDeal(id){if(confirm('Delete this deal from your portal working copy?')){DEALS=DEALS.filter(d=>d.id!==id);saveDeals();closeModal();go('pipeline');}}
+function saveDeal(id){const g=k=>document.getElementById('e_'+k);const d=DEALS.find(x=>x.id===id);if(!d)return;d.acct=g('acct').value;d.mkt=g('mkt').value;d.stage=g('stage').value;d.value=+g('value').value||0;d.emp=+g('emp').value||0;d.owner=g('owner').value;d.ind=g('ind').value;d.close=g('close').value||'—';d.health=Math.max(0,Math.min(100,+g('health').value||0));d.remarks=g('remarks').value;saveDeals();closeModal();go('pipeline');}
 
 const MODULES = [
   {k:'core',    n:'Core HR',      pepm:2.0},
@@ -518,7 +527,14 @@ VIEWS.pipeline = () => {
   }).join('');
   return `
   <div class="vhead"><h1>Pipeline — SEA</h1><p>Live view of every open deal across the region, grouped by stage with stage-weighted forecasting.</p></div>
-  <div class="notice"><span class="ni">🔒</span><div><b>Read-only mirror of the SEA Dashboard.</b> This is the source of record — deals are displayed and analysed here but edited in the SEA Dashboard. Nothing on this screen writes back.</div></div>
+  <div class="notice"><span class="ni">✏️</span><div><b>Your working copy</b> — duplicated from the SEA Weekly Dashboard. Click any deal to edit it; changes save in this browser and never touch your source dashboard.</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <button class="btn primary" onclick="newDeal()">＋ New deal</button>
+    <button class="btn soft" onclick="exportDeals()">⬇ Export</button>
+    <label class="btn soft" style="cursor:pointer;display:inline-flex;align-items:center" for="impdeals">⬆ Import</label>
+    <input id="impdeals" type="file" accept=".json" style="display:none" onchange="importDeals(this)">
+    <button class="btn soft" onclick="resetDeals()">↺ Reset to snapshot</button>
+  </div>
   <div class="grid4" style="margin-bottom:18px">
     <div class="kpi"><div class="lab">Open pipeline</div><div class="val">${fmt(total)}</div></div>
     <div class="kpi"><div class="lab">Weighted forecast</div><div class="val">${fmt(weighted)}</div></div>
@@ -530,24 +546,31 @@ VIEWS.pipeline = () => {
 };
 function healthColor(h){return h>=70?'#16a34a':h>=50?'#d97706':'#dc2626';}
 function openDeal(id){
-  const d=DEALS.find(x=>x.id===id);
-  openModal(d.acct, `
-    <div class="grid2" style="gap:10px">
-      <div class="kpi" style="box-shadow:none"><div class="lab">Value</div><div class="val" style="font-size:20px">${fmt(d.value)}</div></div>
-      <div class="kpi" style="box-shadow:none"><div class="lab">Health</div><div class="val" style="font-size:20px;color:${healthColor(d.health)}">${d.health}%</div></div>
-    </div>
+  const d=DEALS.find(x=>x.id===id); if(!d) return;
+  const opt=(arr,v)=>arr.map(x=>`<option ${x===v?'selected':''}>${x}</option>`).join('');
+  const mkts=MARKETS.map(m=>m.c), stages=STAGES.map(s=>s.k);
+  const enc=s=>(s==null?'':String(s)).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  openModal('Edit deal', `
+    <div><label class="f">Account</label><input class="i" id="e_acct" value="${enc(d.acct)}"></div>
+    <div class="row two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <div><label class="f">Market</label><select class="i" id="e_mkt">${opt(mkts,d.mkt)}</select></div>
+      <div><label class="f">Stage</label><select class="i" id="e_stage">${opt(stages,d.stage)}</select></div></div>
+    <div class="row two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <div><label class="f">Value (USD)</label><input class="i" id="e_value" type="number" value="${d.value}"></div>
+      <div><label class="f">Win %</label><input class="i" id="e_health" type="number" value="${d.health}"></div></div>
+    <div class="row two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <div><label class="f">Close date</label><input class="i" id="e_close" value="${enc(d.close)}" placeholder="YYYY-MM-DD"></div>
+      <div><label class="f">Employees</label><input class="i" id="e_emp" type="number" value="${d.emp}"></div></div>
+    <div class="row two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+      <div><label class="f">Source</label><input class="i" id="e_ind" value="${enc(d.ind)}"></div>
+      <div><label class="f">Owner</label><input class="i" id="e_owner" value="${enc(d.owner)}"></div></div>
+    <div style="margin-top:10px"><label class="f">Remarks</label><textarea class="i" id="e_remarks" rows="3">${enc(d.remarks)}</textarea></div>
     <div class="hr"></div>
-    <table><tbody>
-      <tr><td class="muted">Market</td><td style="text-align:right;font-weight:700">${d.mkt}</td></tr>
-      <tr><td class="muted">Stage</td><td style="text-align:right;font-weight:700">${d.stage} · ${Math.round(stageProb(d.stage)*100)}% prob</td></tr>
-      <tr><td class="muted">Industry</td><td style="text-align:right;font-weight:700">${d.ind}</td></tr>
-      <tr><td class="muted">Employees</td><td style="text-align:right;font-weight:700">${num(d.emp)}</td></tr>
-      <tr><td class="muted">Owner</td><td style="text-align:right;font-weight:700">${d.owner}</td></tr>
-      <tr><td class="muted">Close date</td><td style="text-align:right;font-weight:700">${d.close}</td></tr>
-    </tbody></table>
-    <div class="hr"></div>
-    <button class="btn primary" style="width:100%" onclick="closeModal();go('account');setTimeout(()=>selectAccount('${d.id}'),30)">🎖️ Open account strategy &amp; close plan →</button>
-    <p class="muted" style="font-size:11.5px;margin-top:10px;text-align:center">Read-only mirror — edits happen in the SEA Dashboard.</p>`);
+    <div style="display:flex;gap:8px">
+      <button class="btn primary" style="flex:1" onclick="saveDeal('${d.id}')">💾 Save</button>
+      <button class="btn soft" onclick="closeModal();go('account');setTimeout(()=>selectAccount('${d.id}'),30)">🎖️ Close plan</button>
+      <button class="btn soft" style="color:#dc2626" onclick="deleteDeal('${d.id}')">Delete</button>
+    </div>`);
 }
 
 /* ============================================================= ACCOUNT STRATEGY & CLOSURE */

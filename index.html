@@ -574,17 +574,19 @@ function openDeal(id){
 }
 
 /* ============================================================= ACCOUNT STRATEGY & CLOSURE */
-let ACC={id:'D1', scores:{}};
+let ACC={id:(typeof DEALS!=='undefined'&&DEALS[0]?DEALS[0].id:''), scores:{}};
 function seedScores(d){
+  if(!d) return {};
   // derive starting MEDDICC scores from health so it feels populated
-  const base=Math.round(d.health/100*21);
+  const base=Math.round((d.health||0)/100*21);
   const s={}; let left=base;
   MEDDICC.forEach((m,i)=>{const v=Math.max(0,Math.min(3, Math.round(left/(MEDDICC.length-i)))); s[m.k]=v; left-=v;});
   return s;
 }
 function selectAccount(id){ACC.id=id; ACC.scores=seedScores(DEALS.find(d=>d.id===id)); go('account');}
 VIEWS.account = () => {
-  const d=DEALS.find(x=>x.id===ACC.id);
+  if(!DEALS.length) return '<div class="vhead"><h1>Account Strategy &amp; Closure</h1><p>No deals in the pipeline yet. Add one in the Pipeline tab.</p></div>';
+  let d=DEALS.find(x=>x.id===ACC.id)||DEALS[0]; ACC.id=d.id;
   if(!ACC.scores||!Object.keys(ACC.scores).length) ACC.scores=seedScores(d);
   const picker=`<select class="i" style="max-width:280px" onchange="selectAccount(this.value)">${DEALS.map(x=>`<option value="${x.id}" ${x.id===ACC.id?'selected':''}>${x.acct} — ${x.mkt}</option>`).join('')}</select>`;
   return `

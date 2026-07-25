@@ -78,9 +78,11 @@
             <input id="q" placeholder="Search all files…" oninput="render()"></div>
           <label class="btn" style="cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg> Upload files
             <input id="fileinput" type="file" multiple style="display:none" onchange="pickUpload(this)"></label>
+          <label class="btn" style="cursor:pointer;background:linear-gradient(135deg,#0ea5a4,#0891b2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h5l2 2h11v10H3z"/></svg> Import a folder
+            <input id="folderinput" type="file" webkitdirectory directory multiple style="display:none" onchange="pickFolder(this)"></label>
         </div>
       </div>
-      <div class="drop" id="drop">Drag &amp; drop files here to add them to <b id="dropfolder">this folder</b></div>
+      <div class="drop" id="drop">Drag &amp; drop files <b>or a whole folder</b> here — folders keep their structure. Current target: <b id="dropfolder">this folder</b>.</div>
       <div class="flist" id="flist"></div>
     </section>
   </div>
@@ -137,13 +139,47 @@ async function uploadList(files){
   for(const f of files){try{await F.upload(f,folder);}catch(e){alert('Could not store '+f.name+': '+(e.message||e));}}
   render();
 }
+// ---- bulk folder import (preserves folder structure) ----
+async function pickFolder(inp){await importTree([...inp.files]);inp.value='';}
+async function importTree(files){
+  if(!files.length)return;
+  $('flist').innerHTML='<div class="empty">Importing '+files.length+' files… this can take a moment for large folders.</div>';
+  const set=new Set();let n=0;
+  for(const f of files){
+    const rel=f.webkitRelativePath||f._rel||'';
+    let folder = rel ? rel.split('/').slice(0,-1).join(' / ') : (CUR==='__all__'?'Other':CUR);
+    if(!folder) folder = (CUR==='__all__'?'Other':CUR);
+    if(!F.folders().includes(folder)) F.addFolder(folder);
+    set.add(folder);
+    try{ await F.upload(f, folder); n++; }catch(e){}
+  }
+  render();
+  alert('Imported '+n+' file(s) into '+set.size+' folder(s), keeping your structure.');
+}
+// recurse a dropped directory into File objects tagged with their path
+function walkEntry(entry, dirPath, out){
+  return new Promise(res=>{
+    if(entry.isFile){ entry.file(f=>{ f._rel=(dirPath?dirPath+'/':'')+entry.name; out.push(f); res(); }, ()=>res()); }
+    else if(entry.isDirectory){ const nd=dirPath?dirPath+'/'+entry.name:entry.name; const reader=entry.createReader(); const kids=[];
+      const rb=()=>reader.readEntries(es=>{ if(!es.length){ (async()=>{ for(const k of kids) await walkEntry(k,nd,out); res(); })(); return; } kids.push(...es); rb(); }, ()=>res());
+      rb();
+    } else res();
+  });
+}
 async function usage(){const u=await F.usage();if(u&&u.quota){const pct=Math.min(100,Math.round(u.used/u.quota*100));$('usage').innerHTML=`Storage used: ${fmtSize(u.used)} of ${fmtSize(u.quota)}<div class="bar"><i style="width:${pct}%"></i></div>`;}}
 
 // drag & drop
 const drop=$('drop');
 ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot');}));
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot');}));
-drop.addEventListener('drop',ev=>{if(ev.dataTransfer.files.length)uploadList(ev.dataTransfer.files);});
+drop.addEventListener('drop',async ev=>{
+  const items=ev.dataTransfer.items;
+  const entries=items&&items.length&&items[0].webkitGetAsEntry ? [...items].map(i=>i.webkitGetAsEntry&&i.webkitGetAsEntry()).filter(Boolean) : [];
+  if(entries.some(e=>e&&e.isDirectory)){
+    const out=[]; for(const e of entries) await walkEntry(e,'',out);
+    if(out.length) importTree(out);
+  } else if(ev.dataTransfer.files.length){ uploadList(ev.dataTransfer.files); }
+});
 document.addEventListener('dragover',e=>e.preventDefault());
 document.addEventListener('drop',e=>e.preventDefault());
 

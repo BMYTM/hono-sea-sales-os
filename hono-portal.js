@@ -268,5 +268,116 @@
     async usage() { try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); return { used: e.usage || 0, quota: e.quota || 0 }; } } catch (e) {} return null; },
   };
 
-  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, FILES, readSheetRows, writeXlsx, tokens, cosine };
+  // ---------- AI engine (browser-only; user supplies their own key) ----------
+  // Calls Anthropic or OpenAI directly from the browser. The key is stored ONLY
+  // in this browser's localStorage and is never sent anywhere except the model API.
+  const AI = {
+    key: "hono_ai_cfg",
+    MODELS: {
+      anthropic: [
+        { id: "claude-sonnet-4-5", label: "Claude Sonnet 4.5 (recommended)" },
+        { id: "claude-opus-4-1", label: "Claude Opus 4.1 (deepest)" },
+        { id: "claude-3-5-haiku-latest", label: "Claude Haiku (fastest/cheapest)" },
+      ],
+      openai: [
+        { id: "gpt-4o", label: "GPT-4o (recommended)" },
+        { id: "gpt-4o-mini", label: "GPT-4o mini (fast/cheap)" },
+      ],
+    },
+    cfg() { return LS.get(this.key, { provider: "anthropic", apiKey: "", model: "claude-sonnet-4-5" }); },
+    save(c) { LS.set(this.key, c); },
+    ready() { const c = this.cfg(); return !!(c.apiKey && c.provider && c.model); },
+    forget() { const c = this.cfg(); c.apiKey = ""; this.save(c); },
+    // messages: [{role:'user'|'assistant', content:'...'}]; onToken(delta) optional for streaming.
+    async chat(system, messages, onToken, opts) {
+      const c = this.cfg(); opts = opts || {};
+      if (!c.apiKey) throw new Error("No API key set. Click ⚙ Settings and paste your key.");
+      const maxTokens = opts.maxTokens || 2000;
+      if (c.provider === "anthropic") {
+        return this._anthropic(c, system, messages, maxTokens, onToken);
+      }
+      return this._openai(c, system, messages, maxTokens, onToken);
+    },
+    async _anthropic(c, system, messages, maxTokens, onToken) {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": c.apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({ model: c.model, max_tokens: maxTokens, system: system || "", messages, stream: !!onToken }),
+      });
+      if (!res.ok) throw new Error(await this._err(res));
+      if (!onToken) { const j = await res.json(); return (j.content || []).map(b => b.text || "").join(""); }
+      let full = "";
+      await this._sse(res, (evt) => {
+        try {
+          const d = JSON.parse(evt);
+          if (d.type === "content_block_delta" && d.delta && d.delta.text) { full += d.delta.text; onToken(d.delta.text); }
+        } catch (e) {}
+      });
+      return full;
+    },
+    async _openai(c, system, messages, maxTokens, onToken) {
+      const msgs = (system ? [{ role: "system", content: system }] : []).concat(messages);
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "content-type": "application/json", "authorization": "Bearer " + c.apiKey },
+        body: JSON.stringify({ model: c.model, max_tokens: maxTokens, messages: msgs, stream: !!onToken }),
+      });
+      if (!res.ok) throw new Error(await this._err(res));
+      if (!onToken) { const j = await res.json(); return j.choices[0].message.content; }
+      let full = "";
+      await this._sse(res, (evt) => {
+        if (evt === "[DONE]") return;
+        try { const d = JSON.parse(evt); const t = d.choices[0].delta.content; if (t) { full += t; onToken(t); } } catch (e) {}
+      });
+      return full;
+    },
+    async _sse(res, onEvent) {
+      const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = "";
+      while (true) {
+        const { done, value } = await reader.read(); if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const parts = buf.split("\n\n"); buf = parts.pop();
+        for (const p of parts) {
+          for (const line of p.split("\n")) {
+            const s = line.trim();
+            if (s.startsWith("data:")) onEvent(s.slice(5).trim());
+          }
+        }
+      }
+    },
+    async _err(res) {
+      let msg = "HTTP " + res.status;
+      try { const j = await res.json(); if (j.error && j.error.message) msg = j.error.message; } catch (e) {}
+      if (res.status === 401) msg = "Invalid API key (401). Check the key in ⚙ Settings.";
+      if (res.status === 429) msg = "Rate limited or out of credit (429). " + msg;
+      return msg;
+    },
+    // Build a compact grounding context from the portal's own data.
+    context(opts) {
+      opts = opts || {}; const parts = [];
+      if (opts.assets !== false) {
+        const a = (ASSETS.all() || []).slice(0, 200);
+        if (a.length) parts.push("ASSET LIBRARY (title — category — link):\n" +
+          a.map(x => `- ${x.title} — ${x.category}${x.link ? " — " + x.link : ""}`).join("\n"));
+      }
+      if (opts.rfp !== false) {
+        const b = (RFP.bank() || []).slice(0, 80);
+        if (b.length) parts.push("RFP ANSWER BANK (Q → A):\n" +
+          b.map(e => `Q: ${e.question}\nA: ${e.answer}`).join("\n\n"));
+      }
+      if (opts.files !== false) {
+        const m = (FILES.meta() || []).slice(0, 120);
+        if (m.length) parts.push("FILES ON PORTAL (name — folder):\n" +
+          m.map(x => `- ${x.name} — ${x.folder}`).join("\n"));
+      }
+      return parts.join("\n\n");
+    },
+  };
+
+  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, FILES, AI, readSheetRows, writeXlsx, tokens, cosine };
 })();

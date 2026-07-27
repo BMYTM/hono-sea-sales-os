@@ -362,8 +362,9 @@
       opts = opts || {}; const parts = [];
       if (opts.assets !== false) {
         const a = (ASSETS.all() || []).slice(0, 200);
-        if (a.length) parts.push("ASSET LIBRARY (title — category — link):\n" +
-          a.map(x => `- ${x.title} — ${x.category}${x.link ? " — " + x.link : ""}`).join("\n"));
+        const withLinks = opts.assetLinks !== false; // ask-mode omits links so the AI can't paste a fragile URL
+        if (a.length) parts.push("ASSET LIBRARY (" + (withLinks ? "title — category — link" : "title — category; cite by [[exact title]], the app adds the link") + "):\n" +
+          a.map(x => `- ${x.title} — ${x.category}${withLinks && x.link ? " — " + x.link : ""}`).join("\n"));
       }
       if (opts.rfp !== false) {
         const b = (RFP.bank() || []).slice(0, 80);

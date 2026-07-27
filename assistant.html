@@ -135,8 +135,29 @@ textarea#in:focus{border-color:var(--brand)}
 const $=id=>document.getElementById(id);
 const AI=HONO.AI;
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
-// linkify URLs and keep line breaks
+// Resolve an asset title to its exact catalog link (never let the AI type URLs).
+function assetLink(title){
+  const t=(title||'').trim().toLowerCase(); if(!t)return null;
+  const all=HONO.ASSETS.all()||[];
+  let a=all.find(x=>(x.title||'').trim().toLowerCase()===t);
+  if(!a)a=all.find(x=>(x.title||'').trim().toLowerCase().includes(t)||t.includes((x.title||'').trim().toLowerCase()));
+  return a&&a.link?a.link:null;
+}
+// linkify URLs and keep line breaks (plain formatter)
 function fmt(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
+// AI formatter: turn [[Asset Title]] refs into correct catalog links; linkify any stray URLs.
+function fmtAI(t){
+  let h=esc(t);
+  // 1) linkify any stray raw URLs FIRST (before we inject asset anchors, so we never re-wrap them)
+  h=h.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');
+  // 2) replace [[Asset Title]] with the correct catalog link
+  h=h.replace(/\[\[([^\]]+)\]\]/g,(m,inner)=>{
+    const raw=inner.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&quot;/g,'"').trim();
+    const l=assetLink(raw);
+    return l?`<a href="${encodeURI(l)}" target="_blank">${esc(raw)} ↗</a>`:('<b>'+esc(raw)+'</b>');
+  });
+  return h;
+}
 
 const MODES={
   proposal:{ e:"📄", label:"Proposal draft",
@@ -151,8 +172,8 @@ const MODES={
     starts:["Do you support single sign-on (SSO) and MFA?","How is our data secured and where is it hosted?","Can the system handle multi-country payroll compliance?"] },
   ask:{ e:"💬", label:"Ask your library",
     hint:"Ask anything across your <b>proposals, decks, case studies and RFP bank</b> — e.g. 'which proposals cover payroll for Indonesia?' or 'find a case study for banking'. I'll point you to the right asset with its link.",
-    ground:{assets:true,rfp:true,files:true},
-    sys:"You are a helpful sales-enablement assistant for HONO's SEA team. Answer using ONLY the provided ASSET LIBRARY, RFP ANSWER BANK and FILES context. When you reference an asset, include its SharePoint link so the user can open it. If the answer isn't in the provided context, say so plainly and suggest where they might look. Be concise.",
+    ground:{assets:true,rfp:true,files:true,assetLinks:false},
+    sys:"You are a helpful sales-enablement assistant for HONO's SEA team. Answer using ONLY the provided ASSET LIBRARY, RFP ANSWER BANK and FILES context. CRITICAL: NEVER write out a raw URL or SharePoint link yourself. When you reference an asset, cite it by wrapping its EXACT title in double square brackets, e.g. [[Amata Corporation — Proposal]] — the app turns that into a correct clickable link automatically. Use the exact title as it appears in the ASSET LIBRARY list. If the answer isn't in the provided context, say so plainly and suggest where they might look. Be concise.",
     starts:["Which proposals cover payroll for Indonesia?","Find a case study I can send to a manufacturing prospect","List proposals for banking / financial services clients"] },
   demand:{ e:"📣", label:"Demand-gen outreach",
     hint:"Name a target account or persona and I'll write cold emails, LinkedIn messages and a follow-up sequence — tuned for HONO's SEA HRMS positioning.",
@@ -186,7 +207,7 @@ function starter(el){ $('in').value=el.textContent; onSend(); }
 function bubble(role,text){
   const w=document.querySelector('#chat .welcome'); if(w)w.remove();
   const d=document.createElement('div'); d.className='msg '+(role==='user'?'u':'a');
-  d.innerHTML=`<div class="av ${role==='user'?'u':'a'}">${role==='user'?'You':'AI'}</div><div class="bub">${role==='user'?esc(text):fmt(text)}</div>`;
+  d.innerHTML=`<div class="av ${role==='user'?'u':'a'}">${role==='user'?'You':'AI'}</div><div class="bub">${role==='user'?esc(text):fmtAI(text)}</div>`;
   $('chat').appendChild(d); $('chat').scrollTop=$('chat').scrollHeight;
   return d.querySelector('.bub');
 }
@@ -205,8 +226,8 @@ async function onSend(){
   const out=bubble('assistant',''); out.innerHTML='<span class="blink"></span>';
   let acc='';
   try{
-    await AI.chat(sys, history, (delta)=>{ acc+=delta; out.innerHTML=fmt(acc)+'<span class="blink"></span>'; $('chat').scrollTop=$('chat').scrollHeight; }, {maxTokens:2200});
-    out.innerHTML=fmt(acc)||'(no response)';
+    await AI.chat(sys, history, (delta)=>{ acc+=delta; out.innerHTML=fmtAI(acc)+'<span class="blink"></span>'; $('chat').scrollTop=$('chat').scrollHeight; }, {maxTokens:2200});
+    out.innerHTML=fmtAI(acc)||'(no response)';
     history.push({role:'assistant',content:acc});
   }catch(e){
     out.innerHTML='<span style="color:#b91c1c">⚠ '+esc(e.message)+'</span>';

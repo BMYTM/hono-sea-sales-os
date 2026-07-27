@@ -380,5 +380,92 @@
     },
   };
 
-  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, FILES, AI, readSheetRows, writeXlsx, tokens, cosine };
+  // ---------- Microsoft 365 live integration (MSAL + Graph) ----------
+  // Opens SharePoint/OneDrive files by their stable ID (always current, no 404s)
+  // and runs live searches. Needs a one-time Azure app registration; the client/
+  // tenant IDs live in this browser's localStorage. Requires vendor/msal-browser.
+  const MS = {
+    key: "hono_ms_cfg",
+    _app: null,
+    SCOPES: ["User.Read", "Files.Read.All", "Sites.Read.All"],
+    cfg() { return LS.get(this.key, { clientId: "", tenantId: "organizations" }); },
+    save(c) { LS.set(this.key, c); },
+    configured() { return !!this.cfg().clientId; },
+    available() { return typeof msal !== "undefined"; },
+    redirectUri() { return location.origin + location.pathname; },
+    app() {
+      if (this._app) return this._app;
+      if (!this.available()) throw new Error("Microsoft sign-in library not loaded on this page.");
+      const c = this.cfg();
+      if (!c.clientId) throw new Error("Microsoft 365 isn't set up yet. Add your Azure client ID in ⚙ Settings.");
+      this._app = new msal.PublicClientApplication({
+        auth: { clientId: c.clientId, authority: "https://login.microsoftonline.com/" + (c.tenantId || "organizations"), redirectUri: this.redirectUri() },
+        cache: { cacheLocation: "localStorage" },
+      });
+      return this._app;
+    },
+    async init() { if (!this.available() || !this.configured()) return; try { await this.app().initialize(); } catch (e) {} },
+    account() { try { const a = this.app().getAllAccounts(); return a && a.length ? a[0] : null; } catch (e) { return null; } },
+    signedIn() { return !!this.account(); },
+    async login() {
+      const app = this.app(); await app.initialize();
+      const res = await app.loginPopup({ scopes: this.SCOPES, prompt: "select_account" });
+      if (res && res.account) app.setActiveAccount(res.account);
+      return this.account();
+    },
+    async logout() { try { const app = this.app(); await app.initialize(); await app.logoutPopup({ account: this.account() }); } catch (e) {} this._app = null; },
+    async token() {
+      const app = this.app(); await app.initialize();
+      const account = this.account(); if (!account) return (await this.login()) && this._token();
+      return this._token();
+    },
+    async _token() {
+      const app = this.app(); const account = this.account();
+      try { const r = await app.acquireTokenSilent({ scopes: this.SCOPES, account }); return r.accessToken; }
+      catch (e) { const r = await app.acquireTokenPopup({ scopes: this.SCOPES, account }); return r.accessToken; }
+    },
+    async graph(path, opts) {
+      const tok = await this.token();
+      const url = path.startsWith("http") ? path : "https://graph.microsoft.com/v1.0" + path;
+      const res = await fetch(url, Object.assign({ headers: { authorization: "Bearer " + tok, "content-type": "application/json" } }, opts || {}));
+      if (!res.ok) { let m = "Graph HTTP " + res.status; try { const j = await res.json(); if (j.error && j.error.message) m = j.error.message; } catch (e) {} throw new Error(m); }
+      return res.json();
+    },
+    // Open a file by stable ID — fetches the CURRENT webUrl from Graph (never the stale path).
+    async openById(driveId, itemId) {
+      const it = await this.graph(`/drives/${driveId}/items/${itemId}?$select=webUrl,name,@microsoft.graph.downloadUrl`);
+      const url = it.webUrl || it["@microsoft.graph.downloadUrl"];
+      if (url) window.open(url, "_blank");
+      return url;
+    },
+    // Resolve a file by name via the Graph Search API → {driveId, itemId, webUrl, name}
+    async resolveByName(name) {
+      const j = await this.graph("/search/query", { method: "POST", body: JSON.stringify({
+        requests: [{ entityTypes: ["driveItem"], query: { queryString: name }, from: 0, size: 5 }] }) });
+      const hits = (((j.value || [])[0] || {}).hitsContainers || [])[0];
+      const first = ((hits && hits.hits) || [])[0];
+      if (!first) return null;
+      const r = first.resource || {};
+      return { driveId: (r.parentReference || {}).driveId, itemId: r.id, webUrl: r.webUrl, name: r.name };
+    },
+    // Open the best match for an asset (uses stored IDs, else resolves by title/name).
+    async openAsset(asset) {
+      if (asset.driveId && asset.itemId) return this.openById(asset.driveId, asset.itemId);
+      const q = (asset.title || "").replace(/ — Proposal$/, "") + " HONO Proposal";
+      const hit = await this.resolveByName(q);
+      if (hit && hit.webUrl) { window.open(hit.webUrl, "_blank"); return hit.webUrl; }
+      throw new Error("Couldn't find this file in SharePoint. It may have been moved or renamed.");
+    },
+    // Live search across the tenant → [{name, webUrl, driveId, itemId, lastModified}]
+    async search(query, size) {
+      const j = await this.graph("/search/query", { method: "POST", body: JSON.stringify({
+        requests: [{ entityTypes: ["driveItem"], query: { queryString: query }, from: 0, size: size || 25 }] }) });
+      const hits = (((j.value || [])[0] || {}).hitsContainers || [])[0];
+      return ((hits && hits.hits) || []).map(h => { const r = h.resource || {}; return {
+        name: r.name, webUrl: r.webUrl, driveId: (r.parentReference || {}).driveId, itemId: r.id,
+        lastModified: r.lastModifiedDateTime }; });
+    },
+  };
+
+  window.HONO = { LS, dl, dlText, RFP, ASSETS, DOCX, IDB, FILES, AI, MS, readSheetRows, writeXlsx, tokens, cosine };
 })();

@@ -143,6 +143,8 @@ function assetLink(title){
   if(!a)a=all.find(x=>(x.title||'').trim().toLowerCase().includes(t)||t.includes((x.title||'').trim().toLowerCase()));
   return a&&a.link?a.link:null;
 }
+// Use already-encoded links as-is (e.g. OneDrive deep-links); only encode raw links.
+function hrefFor(l){l=l||'';return /%[0-9A-Fa-f]{2}/.test(l)?l:encodeURI(l);}
 // linkify URLs and keep line breaks (plain formatter)
 function fmt(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
 // AI formatter: turn [[Asset Title]] refs into correct catalog links; linkify any stray URLs.
@@ -154,7 +156,7 @@ function fmtAI(t){
   h=h.replace(/\[\[([^\]]+)\]\]/g,(m,inner)=>{
     const raw=inner.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&quot;/g,'"').trim();
     const l=assetLink(raw);
-    return l?`<a href="${encodeURI(l)}" target="_blank">${esc(raw)} ↗</a>`:('<b>'+esc(raw)+'</b>');
+    return l?`<a href="${hrefFor(l)}" target="_blank">${esc(raw)} ↗</a>`:('<b>'+esc(raw)+'</b>');
   });
   return h;
 }
